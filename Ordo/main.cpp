@@ -14,8 +14,6 @@ int main(int argc, char* args[])
 
     Engine engine(window);
 
-    SDL_Delay(5000);
-
     sdlManager.quit();
 
     return 0;
