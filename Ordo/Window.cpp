@@ -1,10 +1,10 @@
 #include "Window.h"
+#include <glad/glad.h>
 #include <stdio.h>
 #include <string>
 
-Window::Window(SDLManager& sdlManager, std::string title, int width, int height)
-    : sdlManager(sdlManager),
-    title(title),
+Window::Window(std::string title, int width, int height)
+    : title(title),
     width(width),
     height(height)
 {
@@ -18,9 +18,7 @@ Window& Window::init()
     {
         printf("Window could not be created! SDL_Error: %s\n", SDL_GetError());
     }
-
-    glContext = SDL_GL_CreateContext(sdlWindow);
-
+       
     return *this;
 }
 
@@ -28,7 +26,6 @@ void Window::render()
 {
     SDL_GL_SwapWindow(sdlWindow);
 }
-
 
 Window::~Window()
 {

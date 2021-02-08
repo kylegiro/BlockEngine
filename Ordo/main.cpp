@@ -10,7 +10,9 @@ int main(int argc, char* args[])
 {
     SDLManager sdlManager = SDLManager();
 
-    Window window = Window(sdlManager, "Ordo", 800, 600);
+    Window window = Window("Ordo", 800, 600);
+
+    sdlManager.createContext(window);
 
     Engine engine(window);
 

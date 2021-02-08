@@ -1,4 +1,5 @@
 #include "Engine.h"
+#include <glad/glad.h>
 
 Engine::Engine(Window& window) : window(window)
 {
@@ -33,6 +34,8 @@ void Engine::update()
 
 void Engine::render()
 {
+    //glClearColor(0.2f, 0.3f, 0.3f, 1.0f);
+    //glClear(GL_COLOR_BUFFER_BIT);
     window.render();
 }
 

@@ -7,15 +7,15 @@
 class Window
 {
 public:
-	Window(SDLManager& sdlManager, std::string title, int width, int height);
+	Window(std::string title, int width, int height);
 	~Window();
 	Window& init();
 	void render();
 
 private:
+	friend class SDLManager; // allow access to SDL_Window raw pointer
+
 	SDL_Window* sdlWindow;
-	SDL_GLContext glContext;
-	SDLManager& sdlManager;
 	int width, height;
 	std::string title;
 

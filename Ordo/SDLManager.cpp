@@ -1,5 +1,6 @@
 #include "SDL.h"
 #include "SDLManager.h"
+#include "Window.h"
 
 #include <stdio.h>
 #include <glad/glad.h>
@@ -28,6 +29,11 @@ void SDLManager::init()
     {
         die();
     }
+}
+
+void SDLManager::createContext(Window& window)
+{
+    glContext = SDL_GL_CreateContext(window.sdlWindow);
 }
 
 void SDLManager::quit()
