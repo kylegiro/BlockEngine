@@ -2,6 +2,7 @@
 #include "SDLManager.h"
 
 #include <stdio.h>
+#include <glad/glad.h>
 
 SDLManager::SDLManager()
 {
@@ -22,6 +23,11 @@ void SDLManager::init()
     
     SDL_GL_SetAttribute(SDL_GL_DOUBLEBUFFER, 1);
     SDL_GL_SetAttribute(SDL_GL_DEPTH_SIZE, 24);
+
+    if (!gladLoadGLLoader((GLADloadproc)SDL_GL_GetProcAddress))
+    {
+        die();
+    }
 }
 
 void SDLManager::quit()
@@ -31,6 +37,6 @@ void SDLManager::quit()
 
 void SDLManager::die()
 {
-    printf("WARNING: SDL fatal error. SDL_Error: %s\n", SDL_GetError());
+    printf("FATAL: SDL fatal error. SDL_Error: %s\n", SDL_GetError());
     quit();
 }
