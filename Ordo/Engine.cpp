@@ -33,8 +33,10 @@ void Engine::update()
 
 void Engine::render()
 {
+    window.render();
 }
 
 void Engine::quit()
 {
+    isQuit = true;
 }

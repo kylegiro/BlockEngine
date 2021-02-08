@@ -1,4 +1,5 @@
 #pragma once
+#include <SDL.h>
 
 class SDLManager
 {
@@ -6,9 +7,7 @@ public:
 	SDLManager();
 	void init();
 	void quit();
-
-private:
-	bool initialized = false;
+	void die();
 
 };
 

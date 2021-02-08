@@ -10,7 +10,7 @@ int main(int argc, char* args[])
 {
     SDLManager sdlManager = SDLManager();
 
-    Window window = Window();
+    Window window = Window(sdlManager);
 
     Engine engine(window);
 
