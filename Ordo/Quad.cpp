@@ -1,7 +1,11 @@
 #include "Quad.h"
 #include <glad/glad.h>
 
-Quad::Quad()
+Quad::Quad() : Quad(1.0f, 1.0f, 1.0f, 1.0f)
+{
+}
+
+Quad::Quad(float r, float g, float b, float a) : r(r), g(g), b(b), a(a)
 {
     float vertices[] = {
         0.5f,  0.5f, 0.0f,  // top right
@@ -40,8 +44,10 @@ Quad::Quad()
     glBindVertexArray(0);
 }
 
-void Quad::render()
+void Quad::render(Shader& shader)
 {
+    int colorLocation = shader.getUniformLocation("color");
+    glUniform4f(colorLocation, r, g, b, a);
     glBindVertexArray(VAO);
     glDrawElements(GL_TRIANGLES, 6, GL_UNSIGNED_INT, 0);
 }

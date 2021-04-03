@@ -59,3 +59,8 @@ void Shader::use()
 {
     glUseProgram(shaderProgram);
 }
+
+int Shader::getUniformLocation(std::string uniform)
+{
+    return glGetUniformLocation(shaderProgram, uniform.c_str());
+}

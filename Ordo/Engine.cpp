@@ -3,7 +3,7 @@
 
 Engine::Engine(Window& window, Shader& shader) : window(window), shader(shader)
 {
-    quad = Quad();
+    quad = Quad(1.0f, 0.0f, 0.0f, 1.0f);
     init();
 }
 
@@ -39,7 +39,7 @@ void Engine::render()
     glClear(GL_COLOR_BUFFER_BIT);
 
     shader.use();
-    quad.render();
+    quad.render(shader);
 
     window.render();
 }
