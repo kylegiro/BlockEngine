@@ -6,13 +6,13 @@ class Window;
 class SDLManager
 {
 public:
-	SDLManager();
+	SDLManager(Window& window);
 	void init();
-	void createContext(Window& window); // create GL context for the SDL window
 	void quit();
 	void die();
 
 private:
+	Window& window;
 	SDL_GLContext glContext;
 
 };

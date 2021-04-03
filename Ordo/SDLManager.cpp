@@ -5,7 +5,8 @@
 #include <stdio.h>
 #include <glad/glad.h>
 
-SDLManager::SDLManager()
+
+SDLManager::SDLManager(Window& window) : window(window)
 {
     init();
 }
@@ -17,23 +18,22 @@ void SDLManager::init()
         die();
     }
 
-    SDL_GL_LoadLibrary(NULL);
-    
+    //SDL_GL_LoadLibrary(NULL);
+
     SDL_GL_SetAttribute(SDL_GL_CONTEXT_MAJOR_VERSION, 3);
     SDL_GL_SetAttribute(SDL_GL_CONTEXT_MINOR_VERSION, 3);
-    
+
     SDL_GL_SetAttribute(SDL_GL_DOUBLEBUFFER, 1);
     SDL_GL_SetAttribute(SDL_GL_DEPTH_SIZE, 24);
 
+    glContext = SDL_GL_CreateContext(window.sdlWindow);
+    SDL_GL_MakeCurrent(window.sdlWindow, glContext);
+
+    // GLAD Init
     if (!gladLoadGLLoader((GLADloadproc)SDL_GL_GetProcAddress))
     {
         die();
     }
-}
-
-void SDLManager::createContext(Window& window)
-{
-    glContext = SDL_GL_CreateContext(window.sdlWindow);
 }
 
 void SDLManager::quit()
