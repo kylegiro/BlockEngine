@@ -5,7 +5,7 @@
 class Shader
 {
 public:
-	Shader();
+	Shader(std::string vertexPath, std::string fragmentPath);
 
 private:
 	unsigned int vertexShader;

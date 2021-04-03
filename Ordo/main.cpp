@@ -7,12 +7,15 @@
 #include "Window.h"
 #include "Engine.h"
 #include "Files.h"
+#include "Shader.h"
 
 int main(int argc, char* args[])
 {
     Window window = Window("Ordo", 800, 600);
 
     SDLManager sdlManager = SDLManager(window);    
+
+    Shader shader = Shader("shader.vert", "shader.frag");
 
     Engine engine(window);
 

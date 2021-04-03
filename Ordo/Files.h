@@ -4,5 +4,5 @@
 
 namespace Files 
 {
-	std::string readFile(std::string filePath);	
+	std::string readFile(std::string filePath);
 }
