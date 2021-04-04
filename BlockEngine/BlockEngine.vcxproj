@@ -73,19 +73,21 @@
   <PropertyGroup Label="UserMacros" />
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
     <LinkIncremental>true</LinkIncremental>
-    <IncludePath>C:\Programming Projects\Libraries\glad\include;C:\Programming Projects\Libraries\SDL2-2.0.14\include;$(IncludePath)</IncludePath>
+    <IncludePath>C:\Programming Projects\Libraries\stbi;C:\Programming Projects\Libraries\glm-0.9.9.8\glm;C:\Programming Projects\Libraries\glad\include;C:\Programming Projects\Libraries\SDL2-2.0.14\include;$(IncludePath)</IncludePath>
     <LibraryPath>C:\Programming Projects\Libraries\SDL2-2.0.14\lib\x86;$(LibraryPath)</LibraryPath>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
     <LinkIncremental>false</LinkIncremental>
+    <IncludePath>C:\Programming Projects\Libraries\stbi;C:\Programming Projects\Libraries\glm-0.9.9.8\glm;$(VC_IncludePath);$(WindowsSDK_IncludePath);</IncludePath>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
     <LinkIncremental>true</LinkIncremental>
-    <IncludePath>C:\Programming Projects\Libraries\glad\include;C:\Programming Projects\Libraries\SDL2-2.0.14\include;$(IncludePath)</IncludePath>
+    <IncludePath>C:\Programming Projects\Libraries\stbi;C:\Programming Projects\Libraries\glm-0.9.9.8\glm;C:\Programming Projects\Libraries\glad\include;C:\Programming Projects\Libraries\SDL2-2.0.14\include;$(IncludePath)</IncludePath>
     <LibraryPath>C:\Programming Projects\Libraries\SDL2-2.0.14\lib\x64;$(LibraryPath)</LibraryPath>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
     <LinkIncremental>false</LinkIncremental>
+    <IncludePath>C:\Programming Projects\Libraries\stbi;C:\Programming Projects\Libraries\glm-0.9.9.8\glm;$(VC_IncludePath);$(WindowsSDK_IncludePath);</IncludePath>
   </PropertyGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
     <ClCompile>
@@ -166,7 +168,6 @@
     <ClInclude Include="Render.h" />
     <ClInclude Include="SDLManager.h" />
     <ClInclude Include="Shader.h" />
-    <ClInclude Include="stb_image.h" />
     <ClInclude Include="Texture.h" />
     <ClInclude Include="Window.h" />
   </ItemGroup>

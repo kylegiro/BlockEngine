@@ -1,5 +1,10 @@
-#include "Quad.h"
 #include <glad/glad.h>
+
+#include <glm/glm.hpp>
+#include <glm/gtc/matrix_transform.hpp>
+#include <glm/gtc/type_ptr.hpp>
+
+#include "Quad.h"
 #include "Texture.h"
 
 Quad::Quad(float r, float g, float b, float a, Texture& texture) : r(r), g(g), b(b), a(a), texture(texture)
@@ -50,10 +55,14 @@ Quad::Quad(float r, float g, float b, float a, Texture& texture) : r(r), g(g), b
 
 void Quad::render(Shader& shader)
 {
-    //int colorLocation = shader.getUniformLocation("color");
-    //glUniform4f(colorLocation, r, g, b, a);
+    // bind texture
     glUniform1i(shader.getUniformLocation("tex"), 0);    
     texture.bind();
+
+    // transformations
+    glm::mat4 transform = glm::mat4(1.0f);
+    transform = glm::translate(transform, glm::vec3(0.5f, -0.5f, 0.0f));    
+    glUniformMatrix4fv(shader.getUniformLocation("transform"), 1, GL_FALSE, glm::value_ptr(transform));
 
     glBindVertexArray(VAO);
     glDrawElements(GL_TRIANGLES, 6, GL_UNSIGNED_INT, 0);
