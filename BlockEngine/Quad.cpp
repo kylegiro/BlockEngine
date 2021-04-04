@@ -60,9 +60,9 @@ void Quad::render(Shader& shader)
     texture.bind();
 
     // transformations
-    glm::mat4 transform = glm::mat4(1.0f);
-    transform = glm::translate(transform, glm::vec3(0.5f, -0.5f, 0.0f));    
-    glUniformMatrix4fv(shader.getUniformLocation("transform"), 1, GL_FALSE, glm::value_ptr(transform));
+    glm::mat4 model = glm::mat4(1.0f);
+    model = glm::translate(model, glm::vec3(0.5f, -0.5f, 0.0f));
+    glUniformMatrix4fv(shader.getUniformLocation("model"), 1, GL_FALSE, glm::value_ptr(model));
 
     glBindVertexArray(VAO);
     glDrawElements(GL_TRIANGLES, 6, GL_UNSIGNED_INT, 0);
