@@ -11,7 +11,7 @@
 
 int main(int argc, char* args[])
 {
-    Window window = Window("Ordo", 800, 800);
+    Window window = Window("BlockEngine", 800, 800);
 
     SDLManager sdlManager = SDLManager(window);    
 
