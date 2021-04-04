@@ -4,6 +4,7 @@
 #include "Shader.h"
 #include "Quad.h"
 #include "Texture.h"
+#include "Camera.h"
 
 class Engine
 {
@@ -18,6 +19,8 @@ public:
 private:
 	Window& window;
 	Shader& shader;
+
+	Camera camera;
 
 	Texture texture;
 	Quad quad;

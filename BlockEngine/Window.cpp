@@ -27,6 +27,11 @@ void Window::render()
     SDL_GL_SwapWindow(sdlWindow);
 }
 
+void Window::centerMouse()
+{
+    SDL_WarpMouseInWindow(sdlWindow, 400, 400);
+}
+
 Window::~Window()
 {
 	SDL_DestroyWindow(sdlWindow);

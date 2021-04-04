@@ -11,6 +11,7 @@ public:
 	~Window();
 	Window& init();
 	void render();
+	void centerMouse();
 
 private:
 	friend class SDLManager; // allow access to SDL_Window raw pointer
