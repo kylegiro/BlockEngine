@@ -1,16 +1,17 @@
 #pragma once
 
 #include "Shader.h"
+#include "Texture.h"
 
 class Quad
 {
 public:
-	Quad();
-	Quad(float r, float g, float b, float a);
+	Quad(float r, float g, float b, float a, Texture& texture);
 	void render(Shader& shader);
 
 private:
+	Texture& texture;
 	unsigned int VBO, VAO, EBO;
-	float r, g, b, a = 1.0f;
+	float r, g, b, a;
 };
 

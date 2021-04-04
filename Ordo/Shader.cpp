@@ -20,7 +20,7 @@ Shader::Shader(std::string vertexPath, std::string fragmentPath)
     if (!success)
     {
         glGetShaderInfoLog(vertexShader, 512, NULL, infoLog);
-        std::cout << "ERROR::SHADER::VERTEX::COMPILATION_FAILED\n" << infoLog << std::endl;
+        std::cout << "ERROR: Vertex shader compilation failed\n" << infoLog << std::endl;
     }
 
     // fragment shader
@@ -35,7 +35,7 @@ Shader::Shader(std::string vertexPath, std::string fragmentPath)
     if (!success)
     {
         glGetShaderInfoLog(fragmentShader, 512, NULL, infoLog);
-        std::cout << "ERROR::SHADER::FRAGMENT::COMPILATION_FAILED\n" << infoLog << std::endl;
+        std::cout << "ERROR: Fragment shader compilation failed\n" << infoLog << std::endl;
     }
 
     // link shaders
@@ -48,7 +48,7 @@ Shader::Shader(std::string vertexPath, std::string fragmentPath)
     glGetProgramiv(shaderProgram, GL_LINK_STATUS, &success);
     if (!success) {
         glGetProgramInfoLog(shaderProgram, 512, NULL, infoLog);
-        std::cout << "ERROR::SHADER::PROGRAM::LINKING_FAILED\n" << infoLog << std::endl;
+        std::cout << "ERROR: Shader program linking failed\n" << infoLog << std::endl;
     }
 
     glDeleteShader(vertexShader);

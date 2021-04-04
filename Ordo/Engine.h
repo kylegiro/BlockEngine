@@ -3,6 +3,7 @@
 #include "Window.h"
 #include "Shader.h"
 #include "Quad.h"
+#include "Texture.h"
 
 class Engine
 {
@@ -17,6 +18,8 @@ public:
 private:
 	Window& window;
 	Shader& shader;
+
+	Texture texture;
 	Quad quad;
 
 	bool isQuit = false;

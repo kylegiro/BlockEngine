@@ -1,9 +1,12 @@
 #include "Engine.h"
+#include "Texture.h"
 #include <glad/glad.h>
 
-Engine::Engine(Window& window, Shader& shader) : window(window), shader(shader)
+Engine::Engine(Window& window, Shader& shader) 
+    : window(window), shader(shader),
+    texture(),
+    quad(1.0f, 1.0f, 1.0f, 1.0f, texture)
 {
-    quad = Quad(1.0f, 0.0f, 0.0f, 1.0f);
     init();
 }
 
