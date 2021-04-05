@@ -1,6 +1,9 @@
 #include "Camera.h"
 #include <iostream>
 
+const float SPEED = 10.0F;
+const float SPRINT_SPEED = 25.0F;
+
 Camera::Camera(glm::vec3 position) :
     position(position),
     front(0.0f, 0.0f, -1.0f),
@@ -9,7 +12,7 @@ Camera::Camera(glm::vec3 position) :
     worldUp(up),
     yaw(-90.0f),
     pitch(0.0f),
-    speed(0.5f),
+    speed(SPEED),
     sensitivity(0.25f)
 {
     updateVectors();
@@ -25,17 +28,19 @@ void Camera::handleInput(SDL_KeyboardEvent e)
     SDL_Scancode key = e.keysym.scancode;
 
     if (key == SDL_SCANCODE_W)
-        position += front * speed;
+        setMoveState(MovementFlag::FORWARD, e.state == SDL_PRESSED ? true : false);
     if (key == SDL_SCANCODE_A)
-        position -= right * speed;
+        setMoveState(MovementFlag::LEFT, e.state == SDL_PRESSED ? true : false);
     if (key == SDL_SCANCODE_S)
-        position -= front * speed;
+        setMoveState(MovementFlag::BACKWARD, e.state == SDL_PRESSED ? true : false);
     if (key == SDL_SCANCODE_D)
-        position += right * speed;
+        setMoveState(MovementFlag::RIGHT, e.state == SDL_PRESSED ? true : false);
     if (key == SDL_SCANCODE_SPACE)
-        position += worldUp * speed;
+        setMoveState(MovementFlag::UP, e.state == SDL_PRESSED ? true : false);
     if (key == SDL_SCANCODE_LCTRL)
-        position -= worldUp * speed;
+        setMoveState(MovementFlag::DOWN, e.state == SDL_PRESSED ? true : false);
+    if (key == SDL_SCANCODE_LSHIFT)
+        setMoveState(MovementFlag::SPRINT, e.state == SDL_PRESSED ? true : false);
 }
 
 void Camera::handleMouse(SDL_MouseMotionEvent e)
@@ -54,6 +59,27 @@ void Camera::handleMouse(SDL_MouseMotionEvent e)
     updateVectors();
 }
 
+void Camera::update(double dt)
+{
+    if (getMoveState(MovementFlag::SPRINT) == true)
+        speed = SPRINT_SPEED;
+    else
+        speed = SPEED;
+
+    if (getMoveState(MovementFlag::FORWARD ))
+        position += front * speed * (float)dt;
+    if (getMoveState(MovementFlag::LEFT))
+        position -= right * speed * (float)dt;
+    if (getMoveState(MovementFlag::BACKWARD))
+        position -= front * speed * (float)dt;
+    if (getMoveState(MovementFlag::RIGHT))
+        position += right * speed * (float)dt;
+    if (getMoveState(MovementFlag::UP))
+        position += worldUp * speed * (float)dt;
+    if (getMoveState(MovementFlag::DOWN))
+        position -= worldUp * speed * (float)dt;
+}
+
 void Camera::updateVectors()
 {
     glm::vec3 front;
@@ -64,4 +90,17 @@ void Camera::updateVectors()
 
     right = glm::normalize(glm::cross(this->front, worldUp));
     up = glm::normalize(glm::cross(right, this->front));
+}
+
+void Camera::setMoveState(MovementFlag flag, bool on)
+{
+    if(on)
+        moveState |= (int)flag;
+    else
+        moveState &= ~(int)flag;
+}
+
+bool Camera::getMoveState(MovementFlag flag)
+{
+    return (moveState & (int)flag) == (int)flag;
 }

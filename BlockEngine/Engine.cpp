@@ -25,7 +25,7 @@ Engine::Engine(Window& window, Shader& shader)
 void Engine::init()
 {
     double t = 0.0;
-    const double dt = 0.05 * 1000; // 20 ticks per second
+    const double dt = 0.01666 * 1000; // 60 ticks per second
 
     long long currentTime = duration_cast<milliseconds>(high_resolution_clock::now().time_since_epoch()).count();
     double accumulator = 0.0;
@@ -61,7 +61,7 @@ void Engine::handleEvents()
             isQuit = true;
         }
 
-        if (event.type == SDL_KEYDOWN)
+        if (event.type == SDL_KEYDOWN || event.type == SDL_KEYUP)
         {
             camera.handleInput(event.key);
         }
@@ -76,8 +76,7 @@ void Engine::handleEvents()
 
 void Engine::update(double dt)
 {
-    std::cout << "dt: " << dt << std::endl;
-    //camera.updatePosition();
+    camera.update(dt);
 }
 
 void Engine::render()
