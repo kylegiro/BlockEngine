@@ -14,11 +14,14 @@ using namespace std::chrono;
 Engine::Engine(Window& window, Shader& shader) 
     : window(window), shader(shader),
     texture(),
-    quad(1.0f, 1.0f, 1.0f, 1.0f, texture),
+    block(1.0f, 1.0f, 1.0f, 1.0f, texture),
     camera(glm::vec3(0.0f, 0.0f, 0.0f))
 {       
     SDL_SetRelativeMouseMode(SDL_TRUE);
     SDL_CaptureMouse(SDL_TRUE);
+
+    glEnable(GL_DEPTH_TEST);
+
     init();
 }
 
@@ -82,7 +85,7 @@ void Engine::update(double dt)
 void Engine::render()
 {
     glClearColor(0.207f, 0.337f, 0.537f, 1.0f);
-    glClear(GL_COLOR_BUFFER_BIT);
+    glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
     shader.use();
 
@@ -92,7 +95,7 @@ void Engine::render()
     glUniformMatrix4fv(shader.getUniformLocation("view"), 1, GL_FALSE, glm::value_ptr(view));
     glUniformMatrix4fv(shader.getUniformLocation("projection"), 1, GL_FALSE, glm::value_ptr(projection));
 
-    quad.render(shader);
+    block.render(shader);
 
     window.render();
 }

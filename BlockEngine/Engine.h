@@ -3,6 +3,7 @@
 #include "Window.h"
 #include "Shader.h"
 #include "Quad.h"
+#include "Block.h"
 #include "Texture.h"
 #include "Camera.h"
 
@@ -23,7 +24,7 @@ private:
 	Camera camera;
 
 	Texture texture;
-	Quad quad;
+	Block block;
 
 	bool isQuit = false;
 
