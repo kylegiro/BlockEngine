@@ -6,6 +6,11 @@
 #include <glm/gtc/matrix_transform.hpp>
 #include <glm/gtc/type_ptr.hpp>
 
+#include <chrono>
+#include <iostream>
+
+using namespace std::chrono;
+
 Engine::Engine(Window& window, Shader& shader) 
     : window(window), shader(shader),
     texture(),
@@ -19,10 +24,29 @@ Engine::Engine(Window& window, Shader& shader)
 
 void Engine::init()
 {
+    double t = 0.0;
+    const double dt = 0.05 * 1000; // 20 ticks per second
+
+    long long currentTime = duration_cast<milliseconds>(high_resolution_clock::now().time_since_epoch()).count();
+    double accumulator = 0.0;
+
     while(!isQuit)
     {
         handleEvents();
-        update();
+
+        long long newTime = duration_cast<milliseconds>(high_resolution_clock::now().time_since_epoch()).count();
+        long long frameTime = newTime - currentTime;
+        currentTime = newTime;
+
+        accumulator += frameTime;
+
+        while (accumulator >= dt)
+        {
+            update(accumulator / 1000);
+            t += dt;
+            accumulator -= dt;            
+        }
+        
         render();
     }
 }
@@ -50,8 +74,10 @@ void Engine::handleEvents()
     }
 }
 
-void Engine::update()
+void Engine::update(double dt)
 {
+    std::cout << "dt: " << dt << std::endl;
+    //camera.updatePosition();
 }
 
 void Engine::render()

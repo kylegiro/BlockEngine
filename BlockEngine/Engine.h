@@ -12,7 +12,7 @@ public:
 	Engine(Window& window, Shader& shader);
 	void init();
 	void handleEvents();
-	void update();
+	void update(double dt);
 	void render();
 	void quit();
 

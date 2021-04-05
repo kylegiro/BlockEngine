@@ -12,7 +12,7 @@ public:
 	Camera(glm::vec3 position);
 	glm::mat4 getView();
 	void handleInput(SDL_KeyboardEvent e);
-	void handleMouse(SDL_MouseMotionEvent e);
+	void handleMouse(SDL_MouseMotionEvent e);	
 
 private:
 	glm::vec3 position, front, up, right, worldUp;

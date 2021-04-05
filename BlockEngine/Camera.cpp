@@ -22,18 +22,20 @@ glm::mat4 Camera::getView()
 
 void Camera::handleInput(SDL_KeyboardEvent e)
 {
-    float velocity = speed;
-
     SDL_Scancode key = e.keysym.scancode;
 
     if (key == SDL_SCANCODE_W)
-        position += front * velocity;
+        position += front * speed;
     if (key == SDL_SCANCODE_A)
-        position -= right * velocity;
+        position -= right * speed;
     if (key == SDL_SCANCODE_S)
-        position -= front * velocity;
+        position -= front * speed;
     if (key == SDL_SCANCODE_D)
-        position += right * velocity;
+        position += right * speed;
+    if (key == SDL_SCANCODE_SPACE)
+        position += worldUp * speed;
+    if (key == SDL_SCANCODE_LCTRL)
+        position -= worldUp * speed;
 }
 
 void Camera::handleMouse(SDL_MouseMotionEvent e)
