@@ -69,7 +69,21 @@ void Chunk::rebuildMesh()
 				if (blocks[x][y][z].getType() == Block::Type::AIR)
 					continue;
 
-                addBlockToMesh(x, y, z);
+                FaceRenderFlags faces = {true, true, true, true, true, true};
+                if (x > 0)
+                    faces.xNeg = !blocks[x-1][y][z].isOpaque();
+                if (x < SIZE-1)
+                    faces.xPos = !blocks[x+1][y][z].isOpaque();
+                if (y > 0)
+                    faces.yNeg = !blocks[x][y-1][z].isOpaque();
+                if (y < SIZE-1)
+                    faces.yPos = !blocks[x][y+1][z].isOpaque();
+                if (z > 0)
+                    faces.zNeg = !blocks[x][y][z-1].isOpaque();
+                if (z < SIZE-1)
+                    faces.zPos = !blocks[x][y][z+1].isOpaque();
+
+                addBlockToMesh(x, y, z, faces);
 			}			           
 		}
 	}
@@ -93,67 +107,151 @@ void Chunk::rebuildMesh()
     std::cout << "vertices: " << this->vertices.size() << std::endl << "indices: " << this->indices.size() << std::endl;
 }
 
-void Chunk::addBlockToMesh(int x, int y, int z)
+void Chunk::addBlockToMesh(int x, int y, int z, FaceRenderFlags faces)
 {
-
-    std::vector<float> vertices = {
-        // front face
-        1.0f + x, -1.0f + y, -1.0f + z,     0.0f, 0.0f,
-        -1.0f + x, -1.0f + y, -1.0f + z,    1.0f, 0.0f,
-        -1.0f + x, 1.0f + y, -1.0f + z,     1.0f, 1.0f,
-        1.0f + x, 1.0f + y, -1.0f + z,      0.0f, 1.0f,
-        // back face
-        -1.0f + x, -1.0f + y, 1.0f + z,     0.0f, 0.0f,
-        1.0f + x, -1.0f + y, 1.0f + z,      1.0f, 0.0f,
-        1.0f + x, 1.0f + y, 1.0f + z,       1.0f, 1.0f,
-        -1.0f + x, 1.0f + y, 1.0f + z,      0.0f, 1.0f,
-        // right face
-       1.0f + x, -1.0f + y, 1.0f + z,      0.0f, 0.0f,
-       1.0f + x, -1.0f + y, -1.0f + z,     1.0f, 0.0f,
-       1.0f + x, 1.0f + y, -1.0f + z,      1.0f, 1.0f,
-       1.0f + x, 1.0f + y, 1.0f + z,       0.0f, 1.0f,
-       // left face
-      -1.0f + x, -1.0f + y, -1.0f + z,    0.0f, 0.0f,
-      -1.0f + x, -1.0f + y, 1.0f + z,     1.0f, 0.0f,
-      -1.0f + x, 1.0f + y, 1.0f + z,      1.0f, 1.0f,
-      -1.0f + x, 1.0f + y, -1.0f + z,     0.0f, 1.0f,
-      // bottom face
-      -1.0f + x, -1.0f + y, -1.0f + z,    0.0f, 1.0f,
-      1.0f + x, -1.0f + y, -1.0f + z,     1.0f, 1.0f,
-      1.0f + x, -1.0f + y, 1.0f + z,      1.0f, 0.0f,
-      -1.0f + x, -1.0f + y, 1.0f + z,     0.0f, 0.0f,
-      // top face
-      1.0f + x, 1.0f + y, -1.0f + z,      1.0f, 1.0f,
-      -1.0f + x, 1.0f + y, -1.0f + z,     0.0f, 1.0f,
-      -1.0f + x, 1.0f + y, 1.0f + z,      0.0f, 0.0f,
-      1.0f + x, 1.0f + y, 1.0f + z,       1.0f, 0.0f
-    };
-
-    std::vector<unsigned int> indices = {
-        0, 1, 2,        // front low tri
-        0, 2, 3,        // front high tri        
-        4, 5, 6,        // back low tri
-        4, 6, 7,        // back high tri
-        8, 9, 10,      // right low tri
-        8, 10, 11,      // right high tri
-        12, 13, 14,     // left low tri
-        12, 14, 15,     // left high tri
-        16, 18, 19,     // bottom low tri
-        16, 17, 18,     // bottom high tri
-        20, 23, 22,     // top low tri
-        20, 21, 22      // top high tri
-    };
-
-    for (int v = 0; v < vertices.size(); v++)
+    if (faces.xNeg)
     {
-        this->vertices.push_back(vertices[v]);
+        float left[] = {
+            -1.0f + x, -1.0f + y, -1.0f + z,    0.0f, 0.0f,
+            -1.0f + x, -1.0f + y, 1.0f + z,     1.0f, 0.0f,
+            -1.0f + x, 1.0f + y, 1.0f + z,      1.0f, 1.0f,
+            -1.0f + x, 1.0f + y, -1.0f + z,     0.0f, 1.0f
+        };
+
+        for (int v = 0; v < 20; v++)
+        {
+            this->vertices.push_back(left[v]);
+        }
+
+        indices.push_back(glNextIndex);
+        indices.push_back(glNextIndex + 1);
+        indices.push_back(glNextIndex + 2);
+
+        indices.push_back(glNextIndex);
+        indices.push_back(glNextIndex + 2);
+        indices.push_back(glNextIndex + 3);
+
+        glNextIndex += 4;
+    }
+    if (faces.xPos)
+    {
+        float right[] = {
+           1.0f + x, -1.0f + y, 1.0f + z,      0.0f, 0.0f,
+           1.0f + x, -1.0f + y, -1.0f + z,     1.0f, 0.0f,
+           1.0f + x, 1.0f + y, -1.0f + z,      1.0f, 1.0f,
+           1.0f + x, 1.0f + y, 1.0f + z,       0.0f, 1.0f
+        };
+
+        for (int v = 0; v < 20; v++)
+        {
+            this->vertices.push_back(right[v]);
+        }
+
+        indices.push_back(glNextIndex);
+        indices.push_back(glNextIndex + 1);
+        indices.push_back(glNextIndex + 2);
+
+        indices.push_back(glNextIndex);
+        indices.push_back(glNextIndex + 2);
+        indices.push_back(glNextIndex + 3);
+
+        glNextIndex += 4;
+    }
+    if (faces.yNeg)
+    {
+        float bottom[] = {
+            -1.0f + x, -1.0f + y, -1.0f + z,    0.0f, 1.0f,
+            1.0f + x, -1.0f + y, -1.0f + z,     1.0f, 1.0f,
+            1.0f + x, -1.0f + y, 1.0f + z,      1.0f, 0.0f,
+            -1.0f + x, -1.0f + y, 1.0f + z,     0.0f, 0.0f
+        };
+
+        for (int v = 0; v < 20; v++)
+        {
+            this->vertices.push_back(bottom[v]);
+        }
+
+        indices.push_back(glNextIndex);
+        indices.push_back(glNextIndex + 1);
+        indices.push_back(glNextIndex + 2);
+
+        indices.push_back(glNextIndex);
+        indices.push_back(glNextIndex + 2);
+        indices.push_back(glNextIndex + 3);
+
+        glNextIndex += 4;
+    }
+    if (faces.yPos)
+    {
+        float top[] = {
+            1.0f + x, 1.0f + y, -1.0f + z,      1.0f, 1.0f,
+            -1.0f + x, 1.0f + y, -1.0f + z,     0.0f, 1.0f,
+            -1.0f + x, 1.0f + y, 1.0f + z,      0.0f, 0.0f,
+            1.0f + x, 1.0f + y, 1.0f + z,       1.0f, 0.0f
+        };
+
+        for (int v = 0; v < 20; v++)
+        {
+            this->vertices.push_back(top[v]);
+        }
+
+        indices.push_back(glNextIndex);
+        indices.push_back(glNextIndex + 1);
+        indices.push_back(glNextIndex + 2);
+
+        indices.push_back(glNextIndex);
+        indices.push_back(glNextIndex + 2);
+        indices.push_back(glNextIndex + 3);
+
+        glNextIndex += 4;
+    }
+    if (faces.zNeg)
+    {
+        float front[] = {
+            1.0f + x, -1.0f + y, -1.0f + z,     0.0f, 0.0f,
+            -1.0f + x, -1.0f + y, -1.0f + z,    1.0f, 0.0f,
+            -1.0f + x, 1.0f + y, -1.0f + z,     1.0f, 1.0f,
+            1.0f + x, 1.0f + y, -1.0f + z,      0.0f, 1.0f
+        };
+
+        for (int v = 0; v < 20; v++)
+        {
+            this->vertices.push_back(front[v]);
+        }
+
+        indices.push_back(glNextIndex);
+        indices.push_back(glNextIndex + 1);
+        indices.push_back(glNextIndex + 2);
+
+        indices.push_back(glNextIndex);
+        indices.push_back(glNextIndex + 2);
+        indices.push_back(glNextIndex + 3);
+
+        glNextIndex += 4;
+    }
+    if (faces.zPos)
+    {
+        float back[] = {
+            -1.0f + x, -1.0f + y, 1.0f + z,     0.0f, 0.0f,
+            1.0f + x, -1.0f + y, 1.0f + z,      1.0f, 0.0f,
+            1.0f + x, 1.0f + y, 1.0f + z,       1.0f, 1.0f,
+            -1.0f + x, 1.0f + y, 1.0f + z,      0.0f, 1.0f
+        };
+
+        for (int v = 0; v < 20; v++)
+        {
+            this->vertices.push_back(back[v]);
+        }
+
+        indices.push_back(glNextIndex);
+        indices.push_back(glNextIndex+1);
+        indices.push_back(glNextIndex+2);
+
+        indices.push_back(glNextIndex);
+        indices.push_back(glNextIndex+2);
+        indices.push_back(glNextIndex+3);
+
+        glNextIndex += 4;
     }
 
-    for (int i = 0; i < indices.size(); i++)
-    {
-        unsigned int index = 24 * nextIndex + indices[i];        
-        this->indices.push_back(index);
-    }
-
-    nextIndex++;
 }

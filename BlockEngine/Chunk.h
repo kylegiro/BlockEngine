@@ -8,6 +8,16 @@
 
 const int SIZE = 16;
 
+struct FaceRenderFlags
+{
+	bool xNeg = true;
+	bool xPos = true;
+	bool yNeg = true;
+	bool yPos = true;
+	bool zNeg = true;
+	bool zPos = true;
+};
+
 class Chunk
 {
 public:
@@ -22,9 +32,9 @@ private:
 	Texture& texture;
 	std::vector<float> vertices;
 	std::vector<unsigned int> indices;
-	unsigned int nextIndex = 0;
+	unsigned int glNextIndex = 0;
 
-	void addBlockToMesh(int x, int y, int z);
+	void addBlockToMesh(int x, int y, int z, FaceRenderFlags faces);
 
 	unsigned int VBO, VAO, EBO;
 

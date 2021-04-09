@@ -14,7 +14,9 @@ public:
 	Block();
 	Block(Type type);
 	Type getType();
+	bool isOpaque();
 
+private:
 	Type type;
 };
 

@@ -12,3 +12,8 @@ Block::Type Block::getType()
 {
     return type;
 }
+
+bool Block::isOpaque()
+{
+    return type != AIR;
+}
