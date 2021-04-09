@@ -6,12 +6,15 @@
 class Block
 {
 public:
-	Block(float r, float g, float b, float a, Texture& texture);
-	void render(Shader& shader);
+	enum Type {
+		AIR = 0,
+		STONE = 1
+	};
 
-private:
-	Texture& texture;
-	unsigned int VBO, VAO, EBO;
-	float r, g, b, a;
+	Block();
+	Block(Type type);
+	Type getType();
+
+	Type type;
 };
 
