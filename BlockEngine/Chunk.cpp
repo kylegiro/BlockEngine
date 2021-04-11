@@ -8,36 +8,12 @@
 
 #include <iostream>
 
-Chunk::Chunk(Texture& texture) : texture(texture)
+Chunk::Chunk(int x, int y, int z, Texture& texture) : x(x), y(y), z(z), texture(texture)
 {
-    glGenVertexArrays(1, &VAO);
-    glGenBuffers(1, &VBO);
-    glGenBuffers(1, &EBO); 
-
- 	blocks = new Block**[SIZE];
-	for (int i = 0; i < SIZE; i++)
-	{
-		blocks[i] = new Block*[SIZE];
-		for (int j = 0; j < SIZE; j++)
-		{
-			blocks[i][j] = new Block[SIZE];
-		}
-	}
-
-    rebuildMesh();
 }
 
 Chunk::~Chunk()
 {
-	for (int i = 0; i < SIZE; i++)
-	{
-		for(int j = 0; j < SIZE; j++)
-		{
-			delete[] blocks[i][j];
-		}
-		delete[] blocks[i];
-	}
-	delete[] blocks;
 }
 
 void Chunk::render(Shader& shader)
@@ -48,7 +24,7 @@ void Chunk::render(Shader& shader)
 
     // transformations
     glm::mat4 model = glm::mat4(1.0f);
-    //model = glm::translate(model, glm::vec3(0.5f, -0.5f, 0.0f));
+    model = glm::translate(model, glm::vec3(CHUNK_SIZE * (float)getX(), CHUNK_SIZE * (float)getY(), CHUNK_SIZE * (float)getZ()));
     glUniformMatrix4fv(shader.getUniformLocation("model"), 1, GL_FALSE, glm::value_ptr(model));
 
     glBindVertexArray(VAO);
@@ -60,11 +36,11 @@ void Chunk::rebuildMesh()
     vertices.clear();
     indices.clear();
 
-	for (int x = 0; x < SIZE; x++)
+	for (int x = 0; x < CHUNK_SIZE; x++)
 	{
-		for (int y = 0; y < SIZE; y++)
+		for (int y = 0; y < CHUNK_SIZE; y++)
 		{
-			for (int z = 0; z < SIZE; z++)
+			for (int z = 0; z < CHUNK_SIZE; z++)
 			{
 				if (blocks[x][y][z].getType() == Block::Type::AIR)
 					continue;
@@ -72,15 +48,15 @@ void Chunk::rebuildMesh()
                 FaceRenderFlags faces = {true, true, true, true, true, true};
                 if (x > 0)
                     faces.xNeg = !blocks[x-1][y][z].isOpaque();
-                if (x < SIZE-1)
+                if (x < CHUNK_SIZE-1)
                     faces.xPos = !blocks[x+1][y][z].isOpaque();
                 if (y > 0)
                     faces.yNeg = !blocks[x][y-1][z].isOpaque();
-                if (y < SIZE-1)
+                if (y < CHUNK_SIZE-1)
                     faces.yPos = !blocks[x][y+1][z].isOpaque();
                 if (z > 0)
                     faces.zNeg = !blocks[x][y][z-1].isOpaque();
-                if (z < SIZE-1)
+                if (z < CHUNK_SIZE-1)
                     faces.zPos = !blocks[x][y][z+1].isOpaque();
 
                 addBlockToMesh(x, y, z, faces);
@@ -107,15 +83,83 @@ void Chunk::rebuildMesh()
     std::cout << "vertices: " << this->vertices.size() << std::endl << "indices: " << this->indices.size() << std::endl;
 }
 
+bool Chunk::isLoaded()
+{
+    return loadedFlag;
+}
+
+bool Chunk::isSetup()
+{
+    return setupFlag;
+}
+
+void Chunk::setup()
+{
+    // noise generation here?
+    setupFlag = true;
+}
+
+void Chunk::unload()
+{
+    for (int i = 0; i < CHUNK_SIZE; i++)
+    {
+        for (int j = 0; j < CHUNK_SIZE; j++)
+        {
+            delete[] blocks[i][j];
+        }
+        delete[] blocks[i];
+    }
+    delete[] blocks;
+}
+
+void Chunk::load()
+{
+    glGenVertexArrays(1, &VAO);
+    glGenBuffers(1, &VBO);
+    glGenBuffers(1, &EBO);
+
+    blocks = new Block * *[CHUNK_SIZE];
+    for (int i = 0; i < CHUNK_SIZE; i++)
+    {
+        blocks[i] = new Block * [CHUNK_SIZE];
+        for (int j = 0; j < CHUNK_SIZE; j++)
+        {
+            blocks[i][j] = new Block[CHUNK_SIZE];
+        }
+    }
+
+    loadedFlag = true;
+}
+
+int Chunk::getX()
+{
+    return x;
+}
+
+int Chunk::getY()
+{
+    return y;
+}
+
+int Chunk::getZ()
+{
+    return z;
+}
+
+bool Chunk::shouldRender()
+{
+    return true;
+}
+
 void Chunk::addBlockToMesh(int x, int y, int z, FaceRenderFlags faces)
 {
     if (faces.xNeg)
     {
         float left[] = {
-            -1.0f + x, -1.0f + y, -1.0f + z,    0.0f, 0.0f,
-            -1.0f + x, -1.0f + y, 1.0f + z,     1.0f, 0.0f,
-            -1.0f + x, 1.0f + y, 1.0f + z,      1.0f, 1.0f,
-            -1.0f + x, 1.0f + y, -1.0f + z,     0.0f, 1.0f
+            -0.5f + x, -0.5f + y, -0.5f + z,    0.0f, 0.0f,
+            -0.5f + x, -0.5f + y, 0.5f + z,     1.0f, 0.0f,
+            -0.5f + x, 0.5f + y, 0.5f + z,      1.0f, 1.0f,
+            -0.5f + x, 0.5f + y, -0.5f + z,     0.0f, 1.0f
         };
 
         for (int v = 0; v < 20; v++)
@@ -136,10 +180,10 @@ void Chunk::addBlockToMesh(int x, int y, int z, FaceRenderFlags faces)
     if (faces.xPos)
     {
         float right[] = {
-           1.0f + x, -1.0f + y, 1.0f + z,      0.0f, 0.0f,
-           1.0f + x, -1.0f + y, -1.0f + z,     1.0f, 0.0f,
-           1.0f + x, 1.0f + y, -1.0f + z,      1.0f, 1.0f,
-           1.0f + x, 1.0f + y, 1.0f + z,       0.0f, 1.0f
+           0.5f + x, -0.5f + y, 0.5f + z,      0.0f, 0.0f,
+           0.5f + x, -0.5f + y, -0.5f + z,     1.0f, 0.0f,
+           0.5f + x, 0.5f + y, -0.5f + z,      1.0f, 1.0f,
+           0.5f + x, 0.5f + y, 0.5f + z,       0.0f, 1.0f
         };
 
         for (int v = 0; v < 20; v++)
@@ -160,10 +204,10 @@ void Chunk::addBlockToMesh(int x, int y, int z, FaceRenderFlags faces)
     if (faces.yNeg)
     {
         float bottom[] = {
-            -1.0f + x, -1.0f + y, -1.0f + z,    0.0f, 1.0f,
-            1.0f + x, -1.0f + y, -1.0f + z,     1.0f, 1.0f,
-            1.0f + x, -1.0f + y, 1.0f + z,      1.0f, 0.0f,
-            -1.0f + x, -1.0f + y, 1.0f + z,     0.0f, 0.0f
+            -0.5f + x, -0.5f + y, -0.5f + z,    0.0f, 1.0f,
+            0.5f + x, -0.5f + y, -0.5f + z,     1.0f, 1.0f,
+            0.5f + x, -0.5f + y, 0.5f + z,      1.0f, 0.0f,
+            -0.5f + x, -0.5f + y, 0.5f + z,     0.0f, 0.0f
         };
 
         for (int v = 0; v < 20; v++)
@@ -184,10 +228,10 @@ void Chunk::addBlockToMesh(int x, int y, int z, FaceRenderFlags faces)
     if (faces.yPos)
     {
         float top[] = {
-            1.0f + x, 1.0f + y, -1.0f + z,      1.0f, 1.0f,
-            -1.0f + x, 1.0f + y, -1.0f + z,     0.0f, 1.0f,
-            -1.0f + x, 1.0f + y, 1.0f + z,      0.0f, 0.0f,
-            1.0f + x, 1.0f + y, 1.0f + z,       1.0f, 0.0f
+            0.5f + x, 0.5f + y, -0.5f + z,      1.0f, 1.0f,
+            -0.5f + x, 0.5f + y, -0.5f + z,     0.0f, 1.0f,
+            -0.5f + x, 0.5f + y, 0.5f + z,      0.0f, 0.0f,
+            0.5f + x, 0.5f + y, 0.5f + z,       1.0f, 0.0f
         };
 
         for (int v = 0; v < 20; v++)
@@ -208,10 +252,10 @@ void Chunk::addBlockToMesh(int x, int y, int z, FaceRenderFlags faces)
     if (faces.zNeg)
     {
         float front[] = {
-            1.0f + x, -1.0f + y, -1.0f + z,     0.0f, 0.0f,
-            -1.0f + x, -1.0f + y, -1.0f + z,    1.0f, 0.0f,
-            -1.0f + x, 1.0f + y, -1.0f + z,     1.0f, 1.0f,
-            1.0f + x, 1.0f + y, -1.0f + z,      0.0f, 1.0f
+            0.5f + x, -0.5f + y, -0.5f + z,     0.0f, 0.0f,
+            -0.5f + x, -0.5f + y, -0.5f + z,    1.0f, 0.0f,
+            -0.5f + x, 0.5f + y, -0.5f + z,     1.0f, 1.0f,
+            0.5f + x, 0.5f + y, -0.5f + z,      0.0f, 1.0f
         };
 
         for (int v = 0; v < 20; v++)
@@ -232,10 +276,10 @@ void Chunk::addBlockToMesh(int x, int y, int z, FaceRenderFlags faces)
     if (faces.zPos)
     {
         float back[] = {
-            -1.0f + x, -1.0f + y, 1.0f + z,     0.0f, 0.0f,
-            1.0f + x, -1.0f + y, 1.0f + z,      1.0f, 0.0f,
-            1.0f + x, 1.0f + y, 1.0f + z,       1.0f, 1.0f,
-            -1.0f + x, 1.0f + y, 1.0f + z,      0.0f, 1.0f
+            -0.5f + x, -0.5f + y, 0.5f + z,     0.0f, 0.0f,
+            0.5f + x, -0.5f + y, 0.5f + z,      1.0f, 0.0f,
+            0.5f + x, 0.5f + y, 0.5f + z,       1.0f, 1.0f,
+            -0.5f + x, 0.5f + y, 0.5f + z,      0.0f, 1.0f
         };
 
         for (int v = 0; v < 20; v++)

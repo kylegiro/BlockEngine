@@ -6,6 +6,7 @@
 #include "Chunk.h"
 #include "Texture.h"
 #include "Camera.h"
+#include "ChunkManager.h"
 
 class Engine
 {
@@ -23,8 +24,8 @@ private:
 
 	Camera camera;
 
-	Texture texture;
-	Chunk chunk;
+	Texture texture;	
+	ChunkManager chunkManager;
 
 	bool isQuit = false;
 

@@ -6,7 +6,7 @@
 
 #include <vector>
 
-const int SIZE = 16;
+const int CHUNK_SIZE = 16;
 
 struct FaceRenderFlags
 {
@@ -21,11 +21,20 @@ struct FaceRenderFlags
 class Chunk
 {
 public:
-	Chunk(Texture& texture);
+	Chunk(int x, int y, int z, Texture& texture);
 	~Chunk();
 	void update(double dt);
 	void render(Shader& shader);
 	void rebuildMesh();
+	bool isLoaded();
+	bool isSetup();
+	void setup();
+	void unload();
+	void load();
+	int getX();
+	int getY();
+	int getZ();
+	bool shouldRender();
 
 private:
 	Block*** blocks;
@@ -38,5 +47,9 @@ private:
 
 	unsigned int VBO, VAO, EBO;
 
+	bool loadedFlag = false;
+	bool setupFlag = false;
+
+	int x, y, z;
 };
 

@@ -14,9 +14,9 @@ using namespace std::chrono;
 Engine::Engine(Window& window, Shader& shader) 
     : window(window), shader(shader),
     texture(),
-    chunk(texture),
+    chunkManager(shader, texture),
     camera(glm::vec3(0.0f, 0.0f, 0.0f))
-{       
+{
     SDL_SetRelativeMouseMode(SDL_TRUE);
     SDL_CaptureMouse(SDL_TRUE);
 
@@ -80,6 +80,7 @@ void Engine::handleEvents()
 void Engine::update(double dt)
 {
     camera.update(dt);
+    chunkManager.update(dt);
 }
 
 void Engine::render()
@@ -95,7 +96,7 @@ void Engine::render()
     glUniformMatrix4fv(shader.getUniformLocation("view"), 1, GL_FALSE, glm::value_ptr(view));
     glUniformMatrix4fv(shader.getUniformLocation("projection"), 1, GL_FALSE, glm::value_ptr(projection));
 
-    chunk.render(shader);
+    chunkManager.render();
 
     window.render();
 }
