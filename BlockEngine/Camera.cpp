@@ -80,6 +80,11 @@ void Camera::update(double dt)
         position -= worldUp * speed * (float)dt;
 }
 
+glm::vec3 Camera::getPosition()
+{
+    return position;
+}
+
 void Camera::updateVectors()
 {
     glm::vec3 front;

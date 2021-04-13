@@ -14,8 +14,8 @@ using namespace std::chrono;
 Engine::Engine(Window& window, Shader& shader) 
     : window(window), shader(shader),
     texture(),
-    chunkManager(shader, texture),
-    camera(glm::vec3(0.0f, 0.0f, 0.0f))
+    camera(glm::vec3(0.0f, 0.0f, 0.0f)),
+    chunkManager(shader, texture, camera)    
 {
     SDL_SetRelativeMouseMode(SDL_TRUE);
     SDL_CaptureMouse(SDL_TRUE);

@@ -36,6 +36,22 @@ public:
 	int getZ();
 	bool shouldRender();
 
+	Chunk* getXNeg();
+	Chunk* getXPos();
+	Chunk* getYNeg();
+	Chunk* getYPos();
+	Chunk* getZNeg();
+	Chunk* getZPos();
+	void setXNeg(Chunk* chunk);
+	void setXPos(Chunk* chunk);
+	void setYNeg(Chunk* chunk);
+	void setYPos(Chunk* chunk);
+	void setZNeg(Chunk* chunk);
+	void setZPos(Chunk* chunk);
+	void setNumNeighbors(int numNeighbors);
+	int getNumNeighbors();
+
+
 private:
 	Block*** blocks;
 	Texture& texture;
@@ -49,6 +65,15 @@ private:
 
 	bool loadedFlag = false;
 	bool setupFlag = false;
+
+	// Neighbors
+	int numNeighbors;
+	Chunk* xNeg;
+	Chunk* xPos;
+	Chunk* yNeg;
+	Chunk* yPos;
+	Chunk* zNeg;
+	Chunk* zPos;
 
 	int x, y, z;
 };

@@ -14,6 +14,7 @@ public:
 	void handleInput(SDL_KeyboardEvent e);
 	void handleMouse(SDL_MouseMotionEvent e);
 	void update(double dt);
+	glm::vec3 getPosition();
 
 private:
 	glm::vec3 position, front, up, right, worldUp;

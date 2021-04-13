@@ -8,12 +8,36 @@
 
 #include <iostream>
 
-Chunk::Chunk(int x, int y, int z, Texture& texture) : x(x), y(y), z(z), texture(texture)
+Chunk::Chunk(int x, int y, int z, Texture& texture) : x(x), y(y), z(z), texture(texture), numNeighbors(0)
 {
+    glGenVertexArrays(1, &VAO);
+    glGenBuffers(1, &VBO);
+    glGenBuffers(1, &EBO);
+
+    blocks = new Block * *[CHUNK_SIZE];
+    for (int i = 0; i < CHUNK_SIZE; i++)
+    {
+        blocks[i] = new Block * [CHUNK_SIZE];
+        for (int j = 0; j < CHUNK_SIZE; j++)
+        {
+            blocks[i][j] = new Block[CHUNK_SIZE];
+        }
+    }
+
+    loadedFlag = true;
 }
 
 Chunk::~Chunk()
 {
+    for (int i = 0; i < CHUNK_SIZE; i++)
+    {
+        for (int j = 0; j < CHUNK_SIZE; j++)
+        {
+            delete[] blocks[i][j];
+        }
+        delete[] blocks[i];
+    }
+    delete[] blocks;
 }
 
 void Chunk::render(Shader& shader)
@@ -80,7 +104,7 @@ void Chunk::rebuildMesh()
     glVertexAttribPointer(1, 2, GL_FLOAT, GL_FALSE, 5 * sizeof(float), (void*)(3 * sizeof(float)));
     glEnableVertexAttribArray(1);
 
-    std::cout << "vertices: " << this->vertices.size() << std::endl << "indices: " << this->indices.size() << std::endl;
+    //std::cout << "vertices: " << this->vertices.size() << std::endl << "indices: " << this->indices.size() << std::endl;
 }
 
 bool Chunk::isLoaded()
@@ -101,34 +125,11 @@ void Chunk::setup()
 
 void Chunk::unload()
 {
-    for (int i = 0; i < CHUNK_SIZE; i++)
-    {
-        for (int j = 0; j < CHUNK_SIZE; j++)
-        {
-            delete[] blocks[i][j];
-        }
-        delete[] blocks[i];
-    }
-    delete[] blocks;
+
 }
 
 void Chunk::load()
 {
-    glGenVertexArrays(1, &VAO);
-    glGenBuffers(1, &VBO);
-    glGenBuffers(1, &EBO);
-
-    blocks = new Block * *[CHUNK_SIZE];
-    for (int i = 0; i < CHUNK_SIZE; i++)
-    {
-        blocks[i] = new Block * [CHUNK_SIZE];
-        for (int j = 0; j < CHUNK_SIZE; j++)
-        {
-            blocks[i][j] = new Block[CHUNK_SIZE];
-        }
-    }
-
-    loadedFlag = true;
 }
 
 int Chunk::getX()
@@ -149,6 +150,76 @@ int Chunk::getZ()
 bool Chunk::shouldRender()
 {
     return true;
+}
+
+Chunk* Chunk::getXNeg()
+{
+    return xNeg;
+}
+
+Chunk* Chunk::getXPos()
+{
+    return xPos;
+}
+
+Chunk* Chunk::getYNeg()
+{
+    return yNeg;
+}
+
+Chunk* Chunk::getYPos()
+{
+    return yPos;
+}
+
+Chunk* Chunk::getZNeg()
+{
+    return zNeg;
+}
+
+Chunk* Chunk::getZPos()
+{
+    return zPos;
+}
+
+void Chunk::setXNeg(Chunk* chunk)
+{
+    xNeg = chunk;
+}
+
+void Chunk::setXPos(Chunk* chunk)
+{
+    xPos = chunk;
+}
+
+void Chunk::setYNeg(Chunk* chunk)
+{
+    yNeg = chunk;
+}
+
+void Chunk::setYPos(Chunk* chunk)
+{
+    yPos = chunk;
+}
+
+void Chunk::setZNeg(Chunk* chunk)
+{
+    zNeg = chunk;
+}
+
+void Chunk::setZPos(Chunk* chunk)
+{
+    zPos = chunk;
+}
+
+void Chunk::setNumNeighbors(int numNeighbors)
+{
+    this->numNeighbors = numNeighbors;
+}
+
+int Chunk::getNumNeighbors()
+{
+    return numNeighbors;
 }
 
 void Chunk::addBlockToMesh(int x, int y, int z, FaceRenderFlags faces)
