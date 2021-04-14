@@ -185,7 +185,7 @@ void ChunkManager::update(double dt)
         Chunk* chunk = it->second;
         if (chunk != nullptr)
         {
-            if (chunk->needsRebuild())
+            if (chunk->needsRebuild() && chunk->getNumNeighbors() == 6)
                 rebuildList.push_back(chunk);
         }
     }
@@ -218,7 +218,7 @@ Chunk* ChunkManager::getChunk(int x, int y, int z)
     if (it != chunks.end())
     {
         Chunk* chunk = chunks[coord];
-        return chunks[coord];
+        return chunk;
     }
     return nullptr;
 }
@@ -292,7 +292,6 @@ void ChunkManager::unloadChunk(Chunk* chunk)
             chunkZPos->setNumNeighbors(chunkZPos->getNumNeighbors() - 1);
             chunkZPos->setZNeg(nullptr);
         }
-        chunkZPos->updateSurroundedFlag();
     }
 
     std::unordered_map<ChunkCoord, Chunk*>::iterator it = chunks.find(coord);
