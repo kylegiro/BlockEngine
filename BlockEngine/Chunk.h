@@ -8,6 +8,8 @@
 
 const int CHUNK_SIZE = 16;
 
+class ChunkManager;
+
 struct FaceRenderFlags
 {
 	bool xNeg = true;
@@ -23,18 +25,18 @@ class Chunk
 public:
 	Chunk(int x, int y, int z, Texture& texture);
 	~Chunk();
+
 	void update(double dt);
 	void render(Shader& shader);
-	void rebuildMesh();
-	bool isLoaded();
-	bool isSetup();
-	void setup();
-	void unload();
-	void load();
+
+	void generateTerrain();
+
+	Block getBlock(int x, int y, int z);
+	void setBlock(int x, int y, int z, Block::Type type);
+
 	int getX();
 	int getY();
 	int getZ();
-	bool shouldRender();
 
 	Chunk* getXNeg();
 	Chunk* getXPos();
@@ -51,6 +53,14 @@ public:
 	void setNumNeighbors(int numNeighbors);
 	int getNumNeighbors();
 
+	bool shouldRender();
+	void updateBorderFlags();
+	void updateSurroundedFlag();
+
+	void rebuildMesh(ChunkManager& chunkManager);
+	bool needsRebuild();
+	void setNeedsRebuild(bool rebuild, bool rebuildNeighbors);
+
 
 private:
 	Block*** blocks;
@@ -63,9 +73,6 @@ private:
 
 	unsigned int VBO, VAO, EBO;
 
-	bool loadedFlag = false;
-	bool setupFlag = false;
-
 	// Neighbors
 	int numNeighbors;
 	Chunk* xNeg;
@@ -74,6 +81,9 @@ private:
 	Chunk* yPos;
 	Chunk* zNeg;
 	Chunk* zPos;
+
+	// Flags
+	bool needRebuild, needRebuildNeighbors, empty, surrounded, xNegFull, xPosFull, yNegFull, yPosFull, zNegFull, zPosFull;
 
 	int x, y, z;
 };

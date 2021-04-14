@@ -8,6 +8,8 @@
 
 #include <iostream>
 
+#include "ChunkManager.h"
+
 Chunk::Chunk(int x, int y, int z, Texture& texture) : x(x), y(y), z(z), texture(texture), numNeighbors(0)
 {
     glGenVertexArrays(1, &VAO);
@@ -23,8 +25,7 @@ Chunk::Chunk(int x, int y, int z, Texture& texture) : x(x), y(y), z(z), texture(
             blocks[i][j] = new Block[CHUNK_SIZE];
         }
     }
-
-    loadedFlag = true;
+    generateTerrain();
 }
 
 Chunk::~Chunk()
@@ -40,8 +41,15 @@ Chunk::~Chunk()
     delete[] blocks;
 }
 
+void Chunk::update(double dt)
+{
+}
+
 void Chunk::render(Shader& shader)
 {
+    //if (surrounded)
+    //    return;
+
     // bind texture
     glUniform1i(shader.getUniformLocation("tex"), 0);
     texture.bind();
@@ -55,7 +63,36 @@ void Chunk::render(Shader& shader)
     glDrawElements(GL_TRIANGLES, indices.size(), GL_UNSIGNED_INT, 0);
 }
 
-void Chunk::rebuildMesh()
+void Chunk::generateTerrain()
+{
+    for (int x = 0; x < CHUNK_SIZE; x++)
+    {
+        for (int z = 0; z < CHUNK_SIZE; z++)
+        {
+            for (int y = 0; y < CHUNK_SIZE; y++)
+            {
+                int xWorld = getX() * CHUNK_SIZE + x;
+                int yWorld = getY() * CHUNK_SIZE + y;
+                int zWorld = getZ() * CHUNK_SIZE + z;
+
+                if (yWorld > 15 || yWorld < 0) continue;
+                setBlock(x, y, z, Block::Type::STONE);
+            }
+        }
+    }
+}
+
+Block Chunk::getBlock(int x, int y, int z)
+{
+    return blocks[x][y][z];
+}
+
+void Chunk::setBlock(int x, int y, int z, Block::Type type)
+{
+    blocks[x][y][z].setType(type);
+}
+
+void Chunk::rebuildMesh(ChunkManager& chunkManager)
 {
     vertices.clear();
     indices.clear();
@@ -69,19 +106,107 @@ void Chunk::rebuildMesh()
 				if (blocks[x][y][z].getType() == Block::Type::AIR)
 					continue;
 
-                FaceRenderFlags faces = {true, true, true, true, true, true};
+                FaceRenderFlags faces = { true, true, true, true, true, true };
+                
+               
+                if (x == 0)
+                    faces.xNeg = true;
+                if (x == CHUNK_SIZE - 1)
+                    faces.xPos = false;
                 if (x > 0)
-                    faces.xNeg = !blocks[x-1][y][z].isOpaque();
-                if (x < CHUNK_SIZE-1)
-                    faces.xPos = !blocks[x+1][y][z].isOpaque();
+                    faces.xNeg = !blocks[x - 1][y][z].isOpaque();
+                if (x < CHUNK_SIZE - 1)
+                    faces.xPos = !blocks[x + 1][y][z].isOpaque();  
+
                 if (y > 0)
-                    faces.yNeg = !blocks[x][y-1][z].isOpaque();
-                if (y < CHUNK_SIZE-1)
-                    faces.yPos = !blocks[x][y+1][z].isOpaque();
+                    faces.yNeg = !blocks[x][y - 1][z].isOpaque();
+                if (y < CHUNK_SIZE - 1)
+                    faces.yPos = !blocks[x][y + 1][z].isOpaque();
+
+                if (z == 0)
+                    faces.zNeg = false;
+                if (z == CHUNK_SIZE - 1)
+                    faces.zPos = false;
                 if (z > 0)
-                    faces.zNeg = !blocks[x][y][z-1].isOpaque();
-                if (z < CHUNK_SIZE-1)
-                    faces.zPos = !blocks[x][y][z+1].isOpaque();
+                    faces.zNeg = !blocks[x][y][z - 1].isOpaque();
+                if (z < CHUNK_SIZE - 1)
+                    faces.zPos = !blocks[x][y][z + 1].isOpaque();                    
+                
+                /*
+                if (x == CHUNK_SIZE - 1 || x < CHUNK_SIZE - 1 && !getBlock(x + 1, y, z).isOpaque())
+                {
+                    faces.xPos = true;
+                    if (x == CHUNK_SIZE - 1)
+                    {
+                        faces.xPos = xPos != nullptr && xPos->getBlock(0, y, z).isOpaque() == false;
+                    }
+                }
+
+                if (y == CHUNK_SIZE - 1 || (y < CHUNK_SIZE - 1 && !getBlock(x, y + 1, z).isOpaque()))
+                {
+                    faces.yPos = true;
+                    if (y == CHUNK_SIZE - 1)
+                    {
+                        faces.yPos = yPos != nullptr && yPos->getBlock(x, 0, z).isOpaque() == false;
+                    }
+                }
+               */
+                
+                /*
+                if (x == 0)
+                {
+                    Chunk* chunk = chunkManager.getChunk(x - 1, y, z);
+                    faces.xNeg = chunk != nullptr && !chunk->getBlock(CHUNK_SIZE - 1, y, z).isOpaque();
+                    faces.xPos = !blocks[x + 1][y][z].isOpaque();
+                }
+                else if (x == CHUNK_SIZE - 1) 
+                {
+                    Chunk* chunk = chunkManager.getChunk(x + 1, y, z);
+                    faces.xNeg = !blocks[x - 1][y][z].isOpaque();
+                    faces.xPos = chunk != nullptr && !chunk->getBlock(0, y, z).isOpaque();
+                }
+                else
+                {
+                    faces.xNeg = !blocks[x - 1][y][z].isOpaque();
+                    faces.xPos = !blocks[x + 1][y][z].isOpaque();
+                }
+
+                if (y == 0)
+                {
+                    Chunk* chunk = chunkManager.getChunk(x, y-1, z);
+                    faces.yNeg = chunk != nullptr && !chunk->getBlock(x, CHUNK_SIZE - 1, z).isOpaque();
+                    faces.yPos = !blocks[x][y + 1][z].isOpaque();
+                }
+                else if (y == CHUNK_SIZE - 1)
+                {
+                    Chunk* chunk = chunkManager.getChunk(x, y + 1, z);
+                    faces.yNeg = !blocks[x][y - 1][z].isOpaque();
+                    faces.yPos = chunk != nullptr && !chunk->getBlock(x, 0, z).isOpaque();
+                }
+                else
+                {
+                    faces.yNeg = !blocks[x][y - 1][z].isOpaque();
+                    faces.yPos = !blocks[x][y + 1][z].isOpaque();
+                }
+
+                if (z == 0)
+                {
+                    Chunk* chunk = chunkManager.getChunk(x, y, z - 1);
+                    faces.zNeg = chunk != nullptr && !chunk->getBlock(x, y, CHUNK_SIZE - 1).isOpaque();
+                    faces.zPos = !blocks[x][y][z + 1].isOpaque();
+                }
+                else if (z == CHUNK_SIZE - 1)
+                {
+                    Chunk* chunk = chunkManager.getChunk(x, y, z + 1);
+                    faces.zNeg = !blocks[x][y][z - 1].isOpaque();
+                    faces.zPos = chunk != nullptr && !chunk->getBlock(x, y, 0).isOpaque();
+                }
+                else
+                {
+                    faces.zNeg = !blocks[x][y][z - 1].isOpaque();
+                    faces.zPos = !blocks[x][y][z + 1].isOpaque();
+                }
+                */
 
                 addBlockToMesh(x, y, z, faces);
 			}			           
@@ -103,33 +228,40 @@ void Chunk::rebuildMesh()
     // texture coordinate attribute
     glVertexAttribPointer(1, 2, GL_FLOAT, GL_FALSE, 5 * sizeof(float), (void*)(3 * sizeof(float)));
     glEnableVertexAttribArray(1);
+    
+    updateBorderFlags();
+    updateSurroundedFlag();
 
-    //std::cout << "vertices: " << this->vertices.size() << std::endl << "indices: " << this->indices.size() << std::endl;
+    if (needRebuildNeighbors)
+    {        
+        if (xNeg != nullptr)
+            xNeg->setNeedsRebuild(true, false);
+        if (xPos != nullptr)
+            xPos->setNeedsRebuild(true, false);
+        if (yNeg != nullptr)
+            yNeg->setNeedsRebuild(true, false);
+        if (yPos != nullptr)
+            yPos->setNeedsRebuild(true, false);
+        if (zNeg != nullptr)
+            zNeg->setNeedsRebuild(true, false);
+        if (zPos != nullptr)
+            zPos->setNeedsRebuild(true, false);
+
+        needRebuildNeighbors = false;
+    }
+
+    needRebuild = false;
 }
 
-bool Chunk::isLoaded()
+bool Chunk::needsRebuild()
 {
-    return loadedFlag;
+    return needRebuild;
 }
 
-bool Chunk::isSetup()
+void Chunk::setNeedsRebuild(bool rebuild, bool rebuildNeighbors)
 {
-    return setupFlag;
-}
-
-void Chunk::setup()
-{
-    // noise generation here?
-    setupFlag = true;
-}
-
-void Chunk::unload()
-{
-
-}
-
-void Chunk::load()
-{
+    needRebuild = rebuild;
+    needRebuildNeighbors = rebuildNeighbors;
 }
 
 int Chunk::getX()
@@ -150,6 +282,94 @@ int Chunk::getZ()
 bool Chunk::shouldRender()
 {
     return true;
+}
+
+void Chunk::updateBorderFlags()
+{
+    int xNegCount = 0;
+    int xPosCount = 0;
+    int yNegCount = 0;
+    int yPosCount = 0;
+    int zNegCount = 0;
+    int zPosCount = 0;
+
+    for (int x = 0; x < CHUNK_SIZE; x++)
+    {
+        for (int y = 0; y < CHUNK_SIZE; y++)
+        {
+            if (blocks[x][y][0].isOpaque())
+                zNegCount++;
+            if (blocks[x][y][CHUNK_SIZE-1].isOpaque())
+                zPosCount++;
+        }
+    }
+
+    for (int x = 0; x < CHUNK_SIZE; x++)
+    {
+        for (int z = 0; z < CHUNK_SIZE; z++)
+        {
+            if (blocks[x][0][z].isOpaque())
+                yNegCount++;
+            if (blocks[x][CHUNK_SIZE - 1][z].isOpaque())
+                yPosCount++;
+        }
+    }
+
+    for (int y = 0; y < CHUNK_SIZE; y++)
+    {
+        for (int z = 0; z < CHUNK_SIZE; z++)
+        {
+            if (blocks[0][y][z].isOpaque())
+                xNegCount++;
+            if (blocks[CHUNK_SIZE - 1][y][z].isOpaque())
+                xPosCount++;
+        }
+    }
+
+    xNegFull = false;
+    xPosFull = false;
+    yNegFull = false;
+    yPosFull = false;
+    zNegFull = false;
+    zPosFull = false;
+
+    int fullBorderSize = CHUNK_SIZE * CHUNK_SIZE;
+
+    if (xNegCount == fullBorderSize)
+        xNegFull = true;
+
+    if (xPosCount == fullBorderSize)
+        xPosFull = true;
+
+    if (yNegCount == fullBorderSize)
+        yNegFull = true;
+
+    if (yPosCount == fullBorderSize)
+        yPosFull = true;
+
+    if (zNegCount == fullBorderSize)
+        zNegFull = true;
+
+    if (zPosCount == fullBorderSize)
+        zPosFull = true;
+
+}
+
+void Chunk::updateSurroundedFlag()
+{
+    if (xNeg != nullptr && xNeg->xPosFull &&
+        xPos != nullptr && xPos->xNegFull &&
+        yNeg != nullptr && yNeg->yPosFull &&
+        yPos != nullptr && yPos->yNegFull &&
+        zNeg != nullptr && zNeg->zPosFull &&
+        zPos != nullptr && zPos->zNegFull)
+    {
+        surrounded = true;
+    }
+    else 
+    {
+        surrounded = false;
+    }
 }
 
 Chunk* Chunk::getXNeg()

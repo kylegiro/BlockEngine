@@ -60,8 +60,7 @@ void ChunkManager::update(double dt)
                             float zPos = (float)coord.z * CHUNK_SIZE;
 
                             glm::vec3 center = glm::vec3(xPos, yPos, zPos) + glm::vec3(CHUNK_SIZE * 0.5f, CHUNK_SIZE * 0.5f, CHUNK_SIZE * 0.5f);
-                            float distance = glm::distance(center, camera.getPosition());
-                            //std::cout << i << " CHUNK(X,Y,Z)=(" << coord.x << "," << coord.y << "," << coord.z << ") distance=" << distance << "neighbors=" << chunk->getNumNeighbors() << std::endl;
+                            float distance = glm::distance(center, camera.getPosition());                           
 
                             if (distance <= LOAD_RADIUS) {
                                 loadList.push_back(coord);
@@ -179,6 +178,27 @@ void ChunkManager::update(double dt)
         unloadChunk(chunk);
     }
     unloadList.clear();
+
+    // Check for chunks that need rebuilding
+    for (auto it = chunks.begin(); it != chunks.end(); it++)
+    {
+        Chunk* chunk = it->second;
+        if (chunk != nullptr)
+        {
+            if (chunk->needsRebuild())
+                rebuildList.push_back(chunk);
+        }
+    }
+
+    // Rebuild chunks
+    for (int i = 0; i < rebuildList.size(); i++)
+    {
+        Chunk* chunk = rebuildList[i];
+
+        chunk->rebuildMesh(*this);
+    }
+    rebuildList.clear();
+
 }
 
 void ChunkManager::render()
@@ -190,121 +210,6 @@ void ChunkManager::render()
             chunk->render(shader);
     }
 }
-
-
-/*
-void ChunkManager::updateLoadList()
-{
-    int numLoadedChunks = 0;
-    ChunkList::iterator iterator;
-    for (iterator = loadList.begin(); iterator != loadList.end() && (numLoadedChunks != MAX_CHUNKS); ++iterator) {
-        Chunk* chunk = (*iterator);
-        if (chunk->isLoaded() == false) {
-            if (numLoadedChunks != MAX_CHUNKS) {
-                chunk->load(); // Increase the chunks loaded count
-                numLoadedChunks++;
-                forceVisibilityUpdate = true;
-            }
-        }
-    } // Clear the load list (every frame)
-    loadList.clear();
-}
-
-void ChunkManager::updateSetupList()
-{
-    ChunkList::iterator iterator;
-    for (iterator = setupList.begin(); iterator != setupList.end(); ++iterator) {
-        Chunk* chunk = (*iterator);
-        if (chunk->isLoaded() && !chunk->isSetup()) {
-            chunk->setup();
-            if (chunk->isSetup()) { // Only force the visibility update if we actually setup the chunk, some chunks wait in the pre-setup stage... 
-                forceVisibilityUpdate = true;
-            }
-        }
-    } // Clear the setup list (every frame)    
-    setupList.clear();
-}
-
-void ChunkManager::updateRebuildList()
-{
-    // Rebuild any chunks that are in the rebuild chunk list     
-    ChunkList::iterator iterator;
-    int numRebuiltChunks = 0;
-    for (iterator = rebuildList.begin(); iterator != rebuildList.end() && (numRebuiltChunks != MAX_CHUNKS); ++iterator) {
-        Chunk* chunk = (*iterator);
-        if (chunk->isLoaded() && chunk->isSetup()) {
-            if (numRebuiltChunks != MAX_CHUNKS) {
-                chunk->rebuildMesh(); // If we rebuild a chunk, add it to the list of chunks that need their render flags updated
-                // since we might now be empty or surrounded
-                flagsList.push_back(chunk); // Also add our neighbours since they might now be surrounded too (If we have neighbours)
-                Chunk* xNeg = getChunk(chunk->getX() - 1, chunk->getY(), chunk->getZ());
-                Chunk* xPos = getChunk(chunk->getX() + 1, chunk->getY(), chunk->getZ());
-                Chunk* yNeg = getChunk(chunk->getX(), chunk->getY() - 1, chunk->getZ());
-                Chunk* yPos = getChunk(chunk->getX(), chunk->getY() + 1, chunk->getZ());
-                Chunk* zNeg = getChunk(chunk->getX(), chunk->getY(), chunk->getZ() - 1);
-                Chunk* zPos = getChunk(chunk->getX(), chunk->getY(), chunk->getZ() + 1);
-                if (xNeg != NULL) flagsList.push_back(xNeg);
-                if (xPos != NULL) flagsList.push_back(xPos);
-                if (yNeg != NULL) flagsList.push_back(yNeg);
-                if (yPos != NULL) flagsList.push_back(yPos);
-                if (zNeg != NULL) flagsList.push_back(zNeg);
-                if (zPos != NULL) flagsList.push_back(zPos); // Only rebuild a certain number of chunks per frame
-                numRebuiltChunks++;
-                forceVisibilityUpdate = true;
-            }
-        }
-    }
-    // Clear the rebuild list
-    rebuildList.clear();
-}
-
-void ChunkManager::updateFlagsList()
-{
-}
-
-void ChunkManager::updateUnloadList()
-{
-    ChunkList::iterator iterator;
-    for (iterator = unloadList.begin(); iterator != unloadList.end(); ++iterator) {
-        Chunk* chunk = (*iterator);
-        if (chunk->isLoaded()) {
-            chunk->unload();
-            unloadChunk(chunk);
-            forceVisibilityUpdate = true;
-        }
-    } // Clear the unload list (every frame)    
-    unloadList.clear();
-}
-
-void ChunkManager::updateVisibilityList()
-{
-    visibilityList.clear();
-    // TODO frustum culling
-    for (std::pair<ChunkCoord, Chunk*> pair : chunks)
-    {
-        Chunk* chunk = pair.second;
-        visibilityList.push_back(chunk);
-    }
-}
-
-void ChunkManager::updateRenderList()
-{
-    // Clear the render list each frame BEFORE we do our tests to see what chunks should be rendered     
-    renderList.clear();
-    ChunkList::iterator iterator;
-    for (iterator = visibilityList.begin(); iterator != visibilityList.end(); ++iterator) {
-        Chunk* chunk = (*iterator);
-        if (chunk != NULL) {
-            if (chunk->isLoaded() && chunk->isSetup()) {
-                if (chunk->shouldRender()) // Early flags check so we don't always have to do the frustum check... 
-                {
-                    renderList.push_back(chunk);
-                }
-            }
-        }
-    }
-}
-*/
 
 Chunk* ChunkManager::getChunk(int x, int y, int z)
 {
@@ -322,9 +227,10 @@ void ChunkManager::loadChunk(int x, int y, int z)
 {
     ChunkCoord coord = { x, y, z };
     Chunk* chunk = new Chunk(x, y, z, texture);
-    chunks[coord] = chunk;
-    chunk->rebuildMesh();
-
+    chunks[coord] = chunk;    
+    //problem here. rebuildmnesh works but setneedsrebuild causes weird issues    
+    chunk->setNeedsRebuild(false, true);
+    chunk->rebuildMesh(*this);
     updateNeighbors(chunk, x, y, z);
 }
 
@@ -340,58 +246,58 @@ void ChunkManager::unloadChunk(Chunk* chunk)
     Chunk* chunkZPos = getChunk(coord.x, coord.y, coord.z + 1);
 
     if (chunkXNeg)
-    {
+    {        
         if (chunkXNeg->getXPos())
         {
             chunkXNeg->setNumNeighbors(chunkXNeg->getNumNeighbors() - 1);
             chunkXNeg->setXPos(nullptr);
-        }
+        }        
     }
     if (chunkXPos)
-    {
+    {       
         if (chunkXPos->getXNeg())
         {
             chunkXPos->setNumNeighbors(chunkXPos->getNumNeighbors() - 1);
             chunkXPos->setXNeg(nullptr);
-        }
+        }        
     }
     if (chunkYNeg)
-    {
+    {        
         if (chunkYNeg->getYPos())
         {
             chunkYNeg->setNumNeighbors(chunkYNeg->getNumNeighbors() - 1);
             chunkYNeg->setYPos(nullptr);
-        }
+        }        
     }
     if (chunkYPos)
-    {
+    {        
         if (chunkYPos->getYNeg())
         {
             chunkYPos->setNumNeighbors(chunkYPos->getNumNeighbors() - 1);
             chunkYPos->setYNeg(nullptr);
-        }
+        }        
     }
     if (chunkZNeg)
-    {
+    {       
         if (chunkZNeg->getZPos())
         {
             chunkZNeg->setNumNeighbors(chunkZNeg->getNumNeighbors() - 1);
             chunkZNeg->setZPos(nullptr);
-        }
+        }        
     }
     if (chunkZPos)
-    {
+    {        
         if (chunkZPos->getZNeg())
         {
             chunkZPos->setNumNeighbors(chunkZPos->getNumNeighbors() - 1);
             chunkZPos->setZNeg(nullptr);
         }
+        chunkZPos->updateSurroundedFlag();
     }
 
     std::unordered_map<ChunkCoord, Chunk*>::iterator it = chunks.find(coord);
     if (it != chunks.end())
         chunks.erase(coord);
-    chunk->unload();
     delete chunk;
 }
 
@@ -463,7 +369,7 @@ void ChunkManager::updateNeighbors(Chunk* chunk, int x, int y, int z)
         if (chunkZPos->getZNeg() == nullptr)
         {
             chunkZPos->setNumNeighbors(chunkZPos->getNumNeighbors() + 1);
-            chunkZPos->setYNeg(chunk);
+            chunkZPos->setZNeg(chunk);
         }
     }
 }

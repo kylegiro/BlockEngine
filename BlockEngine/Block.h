@@ -14,6 +14,7 @@ public:
 	Block();
 	Block(Type type);
 	Type getType();
+	void setType(Type type);
 	bool isOpaque();
 
 private:
