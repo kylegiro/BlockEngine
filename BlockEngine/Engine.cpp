@@ -92,7 +92,7 @@ void Engine::handleEvents()
         if (event.type == SDL_MOUSEMOTION)
         {
             if(mouseMode == MouseMode::Camera)
-                camera.handleMouse(event.motion);            
+                camera.handleMouse(event.motion);
         }
     }
 }
@@ -101,6 +101,7 @@ void Engine::update(double dt)
 {
     camera.update(dt);
     chunkManager.update(dt);
+    gui.updateCameraPositionLabel(camera);
 }
 
 void Engine::render()
@@ -116,9 +117,8 @@ void Engine::render()
     glUniformMatrix4fv(shader.getUniformLocation("view"), 1, GL_FALSE, glm::value_ptr(view));
     glUniformMatrix4fv(shader.getUniformLocation("projection"), 1, GL_FALSE, glm::value_ptr(projection));
 
-    gui.render();
-
     chunkManager.render();
+    gui.render();
 
     window.render();
 }
