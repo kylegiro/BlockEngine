@@ -19,10 +19,9 @@ Engine::Engine(SDL_GLContext glContext, Window& window, Shader& shader)
     chunkManager(shader, texture, camera),
     gui(window.getSDLWindow(), glContext)
 {
-    SDL_SetRelativeMouseMode(SDL_TRUE);
-    SDL_CaptureMouse(SDL_TRUE);
-
     glEnable(GL_DEPTH_TEST);
+
+    SDL_SetRelativeMouseMode(SDL_TRUE);    
 
     init();
 }
@@ -65,17 +64,35 @@ void Engine::handleEvents()
         {            
             isQuit = true;
         }
+       
+        if (event.type == SDL_KEYDOWN)
+        {
+            if (event.key.keysym.scancode == SDL_SCANCODE_C)
+            {
+                if (mouseMode == MouseMode::Camera)
+                {
+                    mouseMode = MouseMode::GUI;
+                    SDL_SetRelativeMouseMode(SDL_FALSE);
+                    window.centerMouse();
+                }
+                else
+                {
+                    mouseMode = MouseMode::Camera;
+                    SDL_SetRelativeMouseMode(SDL_TRUE);
+                }
+
+            }
+        }       
 
         if (event.type == SDL_KEYDOWN || event.type == SDL_KEYUP)
         {
-            camera.handleInput(event.key);
-
+            camera.handleInput(event.key);           
         }
 
         if (event.type == SDL_MOUSEMOTION)
         {
-            camera.handleMouse(event.motion);
-            window.centerMouse();
+            if(mouseMode == MouseMode::Camera)
+                camera.handleMouse(event.motion);            
         }
     }
 }

@@ -9,6 +9,12 @@
 #include "ChunkManager.h"
 #include "GUI.h"
 
+enum class MouseMode
+{
+	Camera, 
+	GUI
+};
+
 class Engine
 {
 public:
@@ -29,6 +35,8 @@ private:
 
 	Texture texture;	
 	ChunkManager chunkManager;
+
+	MouseMode mouseMode = MouseMode::Camera;
 
 	bool isQuit = false;
 
