@@ -11,11 +11,13 @@
 
 using namespace std::chrono;
 
-Engine::Engine(Window& window, Shader& shader) 
-    : window(window), shader(shader),
+Engine::Engine(SDL_GLContext glContext, Window& window, Shader& shader)
+    : glContext(glContext),
+    window(window), shader(shader),
     texture(),
     camera(glm::vec3(0.0f, 0.0f, 0.0f)),
-    chunkManager(shader, texture, camera)    
+    chunkManager(shader, texture, camera),
+    gui(window.getSDLWindow(), glContext)
 {
     SDL_SetRelativeMouseMode(SDL_TRUE);
     SDL_CaptureMouse(SDL_TRUE);
@@ -67,6 +69,7 @@ void Engine::handleEvents()
         if (event.type == SDL_KEYDOWN || event.type == SDL_KEYUP)
         {
             camera.handleInput(event.key);
+
         }
 
         if (event.type == SDL_MOUSEMOTION)
@@ -95,6 +98,8 @@ void Engine::render()
     projection = glm::perspective(glm::radians(90.0f), 1.0f, 0.1f, 100.0f);
     glUniformMatrix4fv(shader.getUniformLocation("view"), 1, GL_FALSE, glm::value_ptr(view));
     glUniformMatrix4fv(shader.getUniformLocation("projection"), 1, GL_FALSE, glm::value_ptr(projection));
+
+    gui.render();
 
     chunkManager.render();
 

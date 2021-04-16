@@ -10,6 +10,7 @@ public:
 	void init();
 	void quit();
 	void die();
+	SDL_GLContext getContext();
 
 private:
 	Window& window;

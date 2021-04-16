@@ -46,3 +46,8 @@ void SDLManager::die()
     printf("FATAL: SDL fatal error. SDL_Error: %s\n", SDL_GetError());
     quit();
 }
+
+SDL_GLContext SDLManager::getContext()
+{
+    return glContext;
+}

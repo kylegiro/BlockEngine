@@ -32,6 +32,11 @@ void Window::centerMouse()
     SDL_WarpMouseInWindow(sdlWindow, 400, 400);
 }
 
+SDL_Window* Window::getSDLWindow()
+{
+    return sdlWindow;
+}
+
 Window::~Window()
 {
 	SDL_DestroyWindow(sdlWindow);

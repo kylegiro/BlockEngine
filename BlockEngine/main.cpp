@@ -17,7 +17,7 @@ int main(int argc, char* args[])
 
     Shader shader = Shader("shader.vert", "shader.frag");
 
-    Engine engine(window, shader);
+    Engine engine(sdlManager.getContext(), window, shader);
 
     sdlManager.quit();
 

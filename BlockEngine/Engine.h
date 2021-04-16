@@ -7,11 +7,12 @@
 #include "Texture.h"
 #include "Camera.h"
 #include "ChunkManager.h"
+#include "GUI.h"
 
 class Engine
 {
 public:
-	Engine(Window& window, Shader& shader);
+	Engine(SDL_GLContext glContext, Window& window, Shader& shader);
 	void init();
 	void handleEvents();
 	void update(double dt);
@@ -23,6 +24,8 @@ private:
 	Shader& shader;
 
 	Camera camera;
+	GUI gui;
+	SDL_GLContext glContext;
 
 	Texture texture;	
 	ChunkManager chunkManager;
