@@ -101,9 +101,9 @@ void GUI::render(Camera& camera)
 		glm::ivec3 pos = worldToChunk(camera.getPosition());
 		Chunk* chunk = chunkManager.getChunk(pos.x, pos.y, pos.z);
 		if (chunk != nullptr)
-			chunk->setNeedsRebuild(true, true);
-			//chunk->rebuildMesh(chunkManager);
 			chunkManager.updateNeighbors(chunk, pos.x, pos.y, pos.z);
+			chunk->rebuildMesh(chunkManager);
+			chunk->setNeedsRebuild(false, true);
 	}
 	ImGui::End();
 
