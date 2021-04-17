@@ -17,7 +17,7 @@ Engine::Engine(SDL_GLContext glContext, Window& window, Shader& shader)
     texture(),
     camera(glm::vec3(0.0f, 0.0f, 0.0f)),
     chunkManager(shader, texture, camera),
-    gui(window.getSDLWindow(), glContext)
+    gui(window.getSDLWindow(), glContext, chunkManager)
 {
     glEnable(GL_DEPTH_TEST);
 
@@ -118,7 +118,7 @@ void Engine::render()
     glUniformMatrix4fv(shader.getUniformLocation("projection"), 1, GL_FALSE, glm::value_ptr(projection));
 
     chunkManager.render();
-    gui.render();
+    gui.render(camera);
 
     window.render();
 }

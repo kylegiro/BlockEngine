@@ -7,7 +7,8 @@
 
 #include "Util.h"
 
-GUI::GUI(SDL_Window* window, SDL_GLContext glContext) : window(window), glContext(glContext)
+GUI::GUI(SDL_Window* window, SDL_GLContext glContext, ChunkManager& chunkManager) 
+	: window(window), glContext(glContext), chunkManager(chunkManager)
 {
 	ImGui::CreateContext();
 	
@@ -21,7 +22,7 @@ GUI::~GUI()
 }
 
 
-void GUI::render()
+void GUI::render(Camera& camera)
 {
 	ImGui_ImplOpenGL3_NewFrame();
 	ImGui_ImplSDL2_NewFrame(window);
@@ -32,6 +33,13 @@ void GUI::render()
 	//ImGui::SetWindowSize(size);
 	ImGui::Text(cameraPos.c_str());	
 	ImGui::Text(chunkPos.c_str());
+	if (ImGui::Button("Rebuild Chunk"))
+	{
+		glm::ivec3 pos = worldToChunk(camera.getPosition());
+		Chunk* chunk = chunkManager.getChunk(pos.x, pos.y, pos.z);
+		if (chunk != nullptr)
+			chunk->setNeedsRebuild(true, true);
+	}
 	ImGui::End();
 
 	ImGui::Render();
