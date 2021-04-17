@@ -109,16 +109,14 @@ void Chunk::rebuildMesh(ChunkManager& chunkManager)
                 FaceRenderFlags faces = { true, true, true, true, true, true };
 
                 if (x == 0)
-                {
-                    Chunk* chunk = chunkManager.getChunk(getX() - 1, getY(), getZ());
-                    faces.xNeg = chunk != nullptr && !chunk->getBlock(CHUNK_SIZE - 1, y, z).isOpaque();
+                {                    
+                    faces.xNeg = xNeg != nullptr && !xNeg->getBlock(CHUNK_SIZE - 1, y, z).isOpaque();
                     faces.xPos = !blocks[x + 1][y][z].isOpaque();
                 }
                 else if (x == CHUNK_SIZE - 1) 
-                {
-                    Chunk* chunk = chunkManager.getChunk(getX() + 1, getY(), getZ());
+                {                    
                     faces.xNeg = !blocks[x - 1][y][z].isOpaque();
-                    faces.xPos = chunk != nullptr && !chunk->getBlock(0, y, z).isOpaque();
+                    faces.xPos = xPos != nullptr && !xPos->getBlock(0, y, z).isOpaque();
                 }
                 else
                 {
@@ -127,16 +125,14 @@ void Chunk::rebuildMesh(ChunkManager& chunkManager)
                 }
 
                 if (y == 0)
-                {
-                    Chunk* chunk = chunkManager.getChunk(getX(), getY() - 1, getZ());
-                    faces.yNeg = chunk != nullptr && !chunk->getBlock(x, CHUNK_SIZE - 1, z).isOpaque();
+                {                    
+                    faces.yNeg = true; // yNeg != nullptr && !yNeg->getBlock(x, CHUNK_SIZE - 1, z).isOpaque();
                     faces.yPos = !blocks[x][y + 1][z].isOpaque();
                 }
                 else if (y == CHUNK_SIZE - 1)
-                {
-                    Chunk* chunk = chunkManager.getChunk(getX(), getY() + 1, getZ());
+                {                    
                     faces.yNeg = !blocks[x][y - 1][z].isOpaque();
-                    faces.yPos = chunk != nullptr && !chunk->getBlock(x, 0, z).isOpaque();
+                    faces.yPos = true; // yPos != nullptr && !yPos->getBlock(x, 0, z).isOpaque();
                 }
                 else
                 {
@@ -145,16 +141,14 @@ void Chunk::rebuildMesh(ChunkManager& chunkManager)
                 }
 
                 if (z == 0)
-                {
-                    Chunk* chunk = chunkManager.getChunk(getX(), getY(), getZ() - 1);
-                    faces.zNeg = chunk != nullptr && !chunk->getBlock(x, y, CHUNK_SIZE - 1).isOpaque();
+                {                    
+                    faces.zNeg = zNeg != nullptr && !zNeg->getBlock(x, y, CHUNK_SIZE - 1).isOpaque();
                     faces.zPos = !blocks[x][y][z + 1].isOpaque();
                 }
                 else if (z == CHUNK_SIZE - 1)
-                {
-                    Chunk* chunk = chunkManager.getChunk(getX(), getY(), getZ() + 1);
+                {                    
                     faces.zNeg = !blocks[x][y][z - 1].isOpaque();
-                    faces.zPos = chunk != nullptr && !chunk->getBlock(x, y, 0).isOpaque();
+                    faces.zPos = zPos != nullptr && !zPos->getBlock(x, y, 0).isOpaque();
                 }
                 else
                 {
@@ -397,7 +391,7 @@ int Chunk::getNumNeighbors()
 }
 
 void Chunk::addBlockToMesh(int x, int y, int z, FaceRenderFlags faces)
-{
+{    
     if (faces.xNeg)
     {
         float left[] = {

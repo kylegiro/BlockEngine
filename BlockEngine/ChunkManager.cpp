@@ -228,10 +228,10 @@ void ChunkManager::loadChunk(int x, int y, int z)
     ChunkCoord coord = { x, y, z };
     Chunk* chunk = new Chunk(x, y, z, texture);
     chunks[coord] = chunk;    
-    //problem here. rebuildmnesh works but setneedsrebuild causes weird issues    
-    chunk->setNeedsRebuild(false, true);
-    chunk->rebuildMesh(*this);
+    //problem here. rebuildmnesh works but setneedsrebuild causes weird issues            
     updateNeighbors(chunk, x, y, z);
+    chunk->rebuildMesh(*this);
+    chunk->setNeedsRebuild(false, true);
 }
 
 void ChunkManager::unloadChunk(Chunk* chunk)

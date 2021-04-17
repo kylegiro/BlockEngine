@@ -21,7 +21,7 @@ private:
 	ChunkManager& chunkManager;
 
 	std::string cameraPos = "Position: NULL";
-	std::string chunkPos = "Chunk: NULL";
+	std::string chunkPos = "Chunk: NULL";	
 
 };
 

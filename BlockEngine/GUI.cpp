@@ -7,6 +7,9 @@
 
 #include "Util.h"
 
+#define DEBUG_NEIGHBORS
+
+
 GUI::GUI(SDL_Window* window, SDL_GLContext glContext, ChunkManager& chunkManager) 
 	: window(window), glContext(glContext), chunkManager(chunkManager)
 {
@@ -33,12 +36,74 @@ void GUI::render(Camera& camera)
 	//ImGui::SetWindowSize(size);
 	ImGui::Text(cameraPos.c_str());	
 	ImGui::Text(chunkPos.c_str());
+
+#ifdef DEBUG_NEIGHBORS	
+	std::ostringstream ss;
+
+	glm::ivec3 pos = worldToChunk(camera.getPosition());
+	Chunk* chunk = chunkManager.getChunk(pos.x, pos.y, pos.z);
+	if (chunk != nullptr)
+	{
+		Chunk* xNeg = chunk->getXNeg();
+		if (xNeg != nullptr)
+		{
+			ss << "xNeg: (" << xNeg->getX() << "," << xNeg->getY() << "," << xNeg->getZ() << ")";
+			ImGui::Text(ss.str().c_str());
+			ss.str(std::string());
+		}
+
+		Chunk* xPos = chunk->getXPos();
+		if (xPos != nullptr)
+		{
+			ss << "xPos: (" << xPos->getX() << "," << xPos->getY() << "," << xPos->getZ() << ")";
+			ImGui::Text(ss.str().c_str());
+			ss.str(std::string());
+		}
+
+		Chunk* yNeg = chunk->getYNeg();
+		if (yNeg != nullptr)
+		{
+			ss << "yNeg: (" << yNeg->getX() << "," << yNeg->getY() << "," << yNeg->getZ() << ")";
+			ImGui::Text(ss.str().c_str());
+			ss.str(std::string());
+		}
+
+		Chunk* yPos = chunk->getYPos();
+		if (yPos != nullptr)
+		{
+			ss << "yPos: (" << yPos->getX() << "," << yPos->getY() << "," << yPos->getZ() << ")";
+			ImGui::Text(ss.str().c_str());
+			ss.str(std::string());
+		}
+
+
+		Chunk* zNeg = chunk->getZNeg();
+		if (zNeg != nullptr)
+		{
+			ss << "zNeg : (" << zNeg->getX() << "," << zNeg->getY() << "," << zNeg->getZ() << ")";
+			ImGui::Text(ss.str().c_str());
+			ss.str(std::string());
+		}
+
+		Chunk* zPos = chunk->getZPos();
+		if (zPos != nullptr)
+		{
+			ss << "zPos: (" << zPos->getX() << "," << zPos->getY() << "," << zPos->getZ() << ")";
+			ImGui::Text(ss.str().c_str());
+			ss.str(std::string());
+		}
+	}
+#endif
+
+
 	if (ImGui::Button("Rebuild Chunk"))
 	{
 		glm::ivec3 pos = worldToChunk(camera.getPosition());
 		Chunk* chunk = chunkManager.getChunk(pos.x, pos.y, pos.z);
 		if (chunk != nullptr)
 			chunk->setNeedsRebuild(true, true);
+			//chunk->rebuildMesh(chunkManager);
+			chunkManager.updateNeighbors(chunk, pos.x, pos.y, pos.z);
 	}
 	ImGui::End();
 
@@ -61,8 +126,8 @@ void GUI::updateCameraPositionLabel(Camera& camera)
 	ss.str(std::string());
 	
 
-	glm::ivec3 chunk = worldToChunk(position);
-	ss << "Chunk: (" << chunk.x << "," << chunk.y << "," << chunk.z << ")";
-	
+	glm::ivec3 chunkCoord = worldToChunk(position);
+	ss << "Chunk: (" << chunkCoord.x << "," << chunkCoord.y << "," << chunkCoord.z << ")";
 	chunkPos = ss.str();
+	ss.str(std::string());
 }
