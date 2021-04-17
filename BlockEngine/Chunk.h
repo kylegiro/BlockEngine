@@ -61,6 +61,8 @@ public:
 	bool needsRebuild();
 	void setNeedsRebuild(bool rebuild, bool rebuildNeighbors);
 
+	int getNumVertices();
+	int getNumIndices();
 
 private:
 	Block*** blocks;

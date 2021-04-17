@@ -92,6 +92,14 @@ void GUI::render(Camera& camera)
 			ImGui::Text(ss.str().c_str());
 			ss.str(std::string());
 		}
+
+		ss << "Vertices: " << chunk->getNumVertices();
+		ImGui::Text(ss.str().c_str());
+		ss.str(std::string());
+
+		ss << "Indices: " << chunk->getNumIndices();
+		ImGui::Text(ss.str().c_str());
+		ss.str(std::string());
 	}
 #endif
 
@@ -102,8 +110,8 @@ void GUI::render(Camera& camera)
 		Chunk* chunk = chunkManager.getChunk(pos.x, pos.y, pos.z);
 		if (chunk != nullptr)
 			chunkManager.updateNeighbors(chunk, pos.x, pos.y, pos.z);
-			chunk->rebuildMesh(chunkManager);
 			chunk->setNeedsRebuild(false, true);
+			chunk->rebuildMesh(chunkManager);			
 	}
 	ImGui::End();
 
