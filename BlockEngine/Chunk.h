@@ -3,6 +3,7 @@
 #include "Shader.h"
 #include "Block.h"
 #include "Texture.h"
+#include "NoiseMap.h"
 
 #include <vector>
 
@@ -23,7 +24,7 @@ struct FaceRenderFlags
 class Chunk
 {
 public:
-	Chunk(int x, int y, int z, Texture& texture);
+	Chunk(int x, int y, int z, Texture& texture, NoiseMap& heightMap);
 	~Chunk();
 
 	void update(double dt);
@@ -88,5 +89,7 @@ private:
 	bool needRebuild, needRebuildNeighbors, empty, surrounded, xNegFull, xPosFull, yNegFull, yPosFull, zNegFull, zPosFull;
 
 	int x, y, z;
+
+	NoiseMap& heightMap;
 };
 

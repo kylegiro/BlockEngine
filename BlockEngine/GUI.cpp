@@ -7,11 +7,12 @@
 
 #include "Util.h"
 
-#define DEBUG_NEIGHBORS
+// #define DEBUG_NEIGHBORS
+#define DEBUG_HEIGHTMAP
 
 
-GUI::GUI(SDL_Window* window, SDL_GLContext glContext, ChunkManager& chunkManager) 
-	: window(window), glContext(glContext), chunkManager(chunkManager)
+GUI::GUI(SDL_Window* window, SDL_GLContext glContext, ChunkManager& chunkManager, NoiseMap& heightMap)
+	: window(window), glContext(glContext), chunkManager(chunkManager), heightMap(heightMap)
 {
 	ImGui::CreateContext();
 	
@@ -36,6 +37,18 @@ void GUI::render(Camera& camera)
 	//ImGui::SetWindowSize(size);
 	ImGui::Text(cameraPos.c_str());	
 	ImGui::Text(chunkPos.c_str());
+
+#ifdef DEBUG_HEIGHTMAP	
+	std::ostringstream hmss;
+	double x = floor(camera.getPosition().x);
+	double z = floor(camera.getPosition().z);
+	double height = heightMap.getValue(x, z);
+	
+	hmss << "HeightMap: " << height;
+
+	ImGui::Text(hmss.str().c_str());
+#endif
+
 
 #ifdef DEBUG_NEIGHBORS	
 	std::ostringstream ss;

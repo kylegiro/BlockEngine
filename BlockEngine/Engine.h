@@ -8,6 +8,7 @@
 #include "Camera.h"
 #include "ChunkManager.h"
 #include "GUI.h"
+#include "NoiseMap.h"
 
 enum class MouseMode
 {
@@ -23,7 +24,7 @@ public:
 	void handleEvents();
 	void update(double dt);
 	void render();
-	void quit();
+	void quit();	
 
 private:
 	Window& window;
@@ -39,6 +40,8 @@ private:
 	MouseMode mouseMode = MouseMode::Camera;
 
 	bool isQuit = false;
+
+	NoiseMap heightMap;
 
 };
 

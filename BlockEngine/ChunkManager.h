@@ -6,10 +6,11 @@
 #include "Chunk.h"
 #include "Shader.h"
 #include "Camera.h"
+#include "NoiseMap.h"
 
 const unsigned int MAX_CHUNKS = 32;
-const unsigned int LOAD_RADIUS = CHUNK_SIZE * 4;
-const unsigned int UNLOAD_RADIUS = CHUNK_SIZE * 5;
+const unsigned int LOAD_RADIUS = CHUNK_SIZE * 8;
+const unsigned int UNLOAD_RADIUS = LOAD_RADIUS + CHUNK_SIZE * 1;
 const unsigned int MAX_CHUNKLOAD_PER_FRAME = 2;
 
 struct ChunkCoord {
@@ -40,13 +41,13 @@ typedef std::unordered_map<ChunkCoord, Chunk*, ChunkCoord::Hash> ChunkMap;
 class ChunkManager
 {
 public:
-	ChunkManager(Shader& shader, Texture& texture, Camera& camera);
+	ChunkManager(Shader& shader, Texture& texture, Camera& camera, NoiseMap& heightMap);
 	void update(double dt);
 	void render();
 	Chunk* getChunk(int x, int y, int z);
 	void loadChunk(int x, int y, int z);
 	void unloadChunk(Chunk* chunk);
-	void updateNeighbors(Chunk* chunk, int x, int y, int z);
+	void updateNeighbors(Chunk* chunk, int x, int y, int z);	
 
 private:
 	ChunkMap chunks;
@@ -54,5 +55,7 @@ private:
 	Shader& shader;
 	Texture& texture;
 	Camera& camera;
+	
+	NoiseMap& heightMap;
 };
 

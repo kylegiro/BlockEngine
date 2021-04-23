@@ -14,14 +14,15 @@ using namespace std::chrono;
 Engine::Engine(SDL_GLContext glContext, Window& window, Shader& shader)
     : glContext(glContext),
     window(window), shader(shader),
-    texture(),
+    texture(),    
     camera(glm::vec3(0.0f, 0.0f, 0.0f)),
-    chunkManager(shader, texture, camera),
-    gui(window.getSDLWindow(), glContext, chunkManager)
+    heightMap(),
+    chunkManager(shader, texture, camera, heightMap),
+    gui(window.getSDLWindow(), glContext, chunkManager, heightMap)
 {
     glEnable(GL_DEPTH_TEST);
 
-    SDL_SetRelativeMouseMode(SDL_TRUE);    
+    SDL_SetRelativeMouseMode(SDL_TRUE);
 
     init();
 }

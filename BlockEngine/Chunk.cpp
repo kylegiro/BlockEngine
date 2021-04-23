@@ -10,7 +10,7 @@
 
 #include "ChunkManager.h"
 
-Chunk::Chunk(int x, int y, int z, Texture& texture) : x(x), y(y), z(z), texture(texture), numNeighbors(0)
+Chunk::Chunk(int x, int y, int z, Texture& texture, NoiseMap& heightMap) : x(x), y(y), z(z), texture(texture), numNeighbors(0), heightMap(heightMap)
 {
     glGenVertexArrays(1, &VAO);
     glGenBuffers(1, &VBO);
@@ -39,6 +39,11 @@ Chunk::~Chunk()
         delete[] blocks[i];
     }
     delete[] blocks;
+
+    glDeleteVertexArrays(1, &VAO);
+    glDeleteBuffers(1, &VBO);
+    glDeleteBuffers(1, &EBO);
+
 }
 
 void Chunk::update(double dt)
@@ -66,17 +71,22 @@ void Chunk::render(Shader& shader)
 
 void Chunk::generateTerrain()
 {
+    int yWorld = getY() * CHUNK_SIZE;
+    if (yWorld < 0) return;
+
     for (int x = 0; x < CHUNK_SIZE; x++)
     {
         for (int z = 0; z < CHUNK_SIZE; z++)
         {
             for (int y = 0; y < CHUNK_SIZE; y++)
             {
-                int xWorld = getX() * CHUNK_SIZE + x;
-                int yWorld = getY() * CHUNK_SIZE + y;
-                int zWorld = getZ() * CHUNK_SIZE + z;
+                double xWorld = (double) getX() * CHUNK_SIZE + x;
+                double zWorld = (double) getZ() * CHUNK_SIZE + z;
+                yWorld = getY() * CHUNK_SIZE + y;
 
-                if (yWorld > 15 || yWorld < 0) continue;
+                double height = 30 + 8.0 * heightMap.getValue(xWorld, zWorld);
+
+                if (yWorld > height) continue;
                 setBlock(x, y, z, Block::Type::STONE);
             }
         }
