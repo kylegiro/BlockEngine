@@ -1,6 +1,7 @@
 #include "ChunkManager.h"
 
 #include <iostream>
+#include <algorithm>
 
 ChunkManager::ChunkManager(Shader& shader, Texture& texture, Camera& camera, NoiseMap& heightMap) : shader(shader), texture(texture), camera(camera), heightMap(heightMap)
 {
@@ -22,6 +23,7 @@ void ChunkManager::update(double dt)
     }
     // Update chunks
     int chunksLoaded = 0;
+    sort(updateList.begin(), updateList.end(), Chunk::closestToCamera);
     for (int i = 0; i < updateList.size(); i++)
     {
         Chunk* chunk = updateList[i];      
@@ -226,7 +228,7 @@ Chunk* ChunkManager::getChunk(int x, int y, int z)
 void ChunkManager::loadChunk(int x, int y, int z)
 {
     ChunkCoord coord = { x, y, z };
-    Chunk* chunk = new Chunk(x, y, z, texture, heightMap);
+    Chunk* chunk = new Chunk(x, y, z, texture, heightMap, camera);
     chunks[coord] = chunk;    
     //problem here. rebuildmnesh works but setneedsrebuild causes weird issues            
     updateNeighbors(chunk, x, y, z);

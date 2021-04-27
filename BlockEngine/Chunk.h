@@ -4,6 +4,7 @@
 #include "Block.h"
 #include "Texture.h"
 #include "NoiseMap.h"
+#include "Camera.h"
 
 #include <vector>
 
@@ -24,7 +25,7 @@ struct FaceRenderFlags
 class Chunk
 {
 public:
-	Chunk(int x, int y, int z, Texture& texture, NoiseMap& heightMap);
+	Chunk(int x, int y, int z, Texture& texture, NoiseMap& heightMap, Camera& camera);
 	~Chunk();
 
 	void update(double dt);
@@ -35,9 +36,9 @@ public:
 	Block getBlock(int x, int y, int z);
 	void setBlock(int x, int y, int z, Block::Type type);
 
-	int getX();
-	int getY();
-	int getZ();
+	int getX() const;
+	int getY() const;
+	int getZ() const;
 
 	Chunk* getXNeg();
 	Chunk* getXPos();
@@ -65,6 +66,9 @@ public:
 	int getNumVertices();
 	int getNumIndices();
 
+	bool operator<(const Chunk& other) const;
+	static bool closestToCamera(const Chunk* l, const Chunk* r);
+
 private:
 	Block*** blocks;
 	Texture& texture;
@@ -91,5 +95,6 @@ private:
 	int x, y, z;
 
 	NoiseMap& heightMap;
+	Camera& camera;
 };
 

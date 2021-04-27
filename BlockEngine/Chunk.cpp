@@ -9,12 +9,14 @@
 #include <iostream>
 
 #include "ChunkManager.h"
+#include "Util.h"
 
 
 const float SIDE_SHADE = 0.8f;
 const float BOT_SHADE = 0.8f;
 
-Chunk::Chunk(int x, int y, int z, Texture& texture, NoiseMap& heightMap) : x(x), y(y), z(z), texture(texture), numNeighbors(0), heightMap(heightMap)
+Chunk::Chunk(int x, int y, int z, Texture& texture, NoiseMap& heightMap, Camera& camera) 
+    : x(x), y(y), z(z), texture(texture), numNeighbors(0), heightMap(heightMap), camera(camera)
 {
     glGenVertexArrays(1, &VAO);
     glGenBuffers(1, &VBO);
@@ -243,17 +245,37 @@ int Chunk::getNumIndices()
     return indices.size();
 }
 
-int Chunk::getX()
+bool Chunk::operator<(const Chunk& other) const
+{
+    
+    glm::ivec3 cameraChunkPos = worldToChunk(camera.getPosition());
+
+    int distance = abs(cameraChunkPos.x - x) + abs(cameraChunkPos.y - y) + abs(cameraChunkPos.z - z);
+    int otherDistance = abs(cameraChunkPos.x - other.getX()) + abs(cameraChunkPos.y - other.getY()) + abs(cameraChunkPos.z - other.getZ());
+
+    return distance < otherDistance;
+}
+
+bool Chunk::closestToCamera(const Chunk* l, const Chunk* r)
+{
+    if ((*l) < (*r))
+        return true;
+    if ((*r) < (*l))
+        return false;
+    return (*l) < (*r);
+}
+
+int Chunk::getX() const
 {
     return x;
 }
 
-int Chunk::getY()
+int Chunk::getY() const
 {
     return y;
 }
 
-int Chunk::getZ()
+int Chunk::getZ() const
 {
     return z;
 }

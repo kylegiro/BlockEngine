@@ -8,7 +8,6 @@
 #include "Camera.h"
 #include "NoiseMap.h"
 
-const unsigned int MAX_CHUNKS = 32;
 const unsigned int LOAD_RADIUS = CHUNK_SIZE * 8;
 const unsigned int UNLOAD_RADIUS = LOAD_RADIUS + CHUNK_SIZE * 1;
 const unsigned int MAX_CHUNKLOAD_PER_FRAME = 2;
