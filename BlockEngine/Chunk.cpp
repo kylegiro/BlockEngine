@@ -10,6 +10,10 @@
 
 #include "ChunkManager.h"
 
+
+const float SIDE_SHADE = 0.8f;
+const float BOT_SHADE = 0.8f;
+
 Chunk::Chunk(int x, int y, int z, Texture& texture, NoiseMap& heightMap) : x(x), y(y), z(z), texture(texture), numNeighbors(0), heightMap(heightMap)
 {
     glGenVertexArrays(1, &VAO);
@@ -182,12 +186,16 @@ void Chunk::rebuildMesh(ChunkManager& chunkManager)
     glBufferData(GL_ELEMENT_ARRAY_BUFFER, indices.size() * sizeof(unsigned int), &indices[0], GL_STREAM_DRAW);
 
     // position attribute
-    glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 5 * sizeof(float), (void*)0);
+    glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 8 * sizeof(float), (void*)0);
     glEnableVertexAttribArray(0);
 
     // texture coordinate attribute
-    glVertexAttribPointer(1, 2, GL_FLOAT, GL_FALSE, 5 * sizeof(float), (void*)(3 * sizeof(float)));
-    glEnableVertexAttribArray(1);
+    glVertexAttribPointer(1, 2, GL_FLOAT, GL_FALSE, 8 * sizeof(float), (void*)(3 * sizeof(float)));
+    glEnableVertexAttribArray(1);    
+
+    // color attribute
+    glVertexAttribPointer(2, 3, GL_FLOAT, GL_FALSE, 8 * sizeof(float), (void*)(5 * sizeof(float)));
+    glEnableVertexAttribArray(2);
     glBindVertexArray(0);
     
     updateBorderFlags();
@@ -418,13 +426,13 @@ void Chunk::addBlockToMesh(int x, int y, int z, FaceRenderFlags faces)
     if (faces.xNeg)
     {
         float left[] = {
-            -0.5f + x, -0.5f + y, -0.5f + z,    0.0f, 0.0f,
-            -0.5f + x, -0.5f + y, 0.5f + z,     1.0f, 0.0f,
-            -0.5f + x, 0.5f + y, 0.5f + z,      1.0f, 1.0f,
-            -0.5f + x, 0.5f + y, -0.5f + z,     0.0f, 1.0f
+            -0.5f + x, -0.5f + y, -0.5f + z,    0.0f, 0.0f,     SIDE_SHADE, SIDE_SHADE, SIDE_SHADE,
+            -0.5f + x, -0.5f + y, 0.5f + z,     1.0f, 0.0f,     SIDE_SHADE, SIDE_SHADE, SIDE_SHADE,
+            -0.5f + x, 0.5f + y, 0.5f + z,      1.0f, 1.0f,     SIDE_SHADE, SIDE_SHADE, SIDE_SHADE,
+            -0.5f + x, 0.5f + y, -0.5f + z,     0.0f, 1.0f,     SIDE_SHADE, SIDE_SHADE, SIDE_SHADE
         };
 
-        for (int v = 0; v < 20; v++)
+        for (int v = 0; v < 32; v++)
         {
             this->vertices.push_back(left[v]);
         }
@@ -442,13 +450,13 @@ void Chunk::addBlockToMesh(int x, int y, int z, FaceRenderFlags faces)
     if (faces.xPos)
     {
         float right[] = {
-           0.5f + x, -0.5f + y, 0.5f + z,      0.0f, 0.0f,
-           0.5f + x, -0.5f + y, -0.5f + z,     1.0f, 0.0f,
-           0.5f + x, 0.5f + y, -0.5f + z,      1.0f, 1.0f,
-           0.5f + x, 0.5f + y, 0.5f + z,       0.0f, 1.0f
+           0.5f + x, -0.5f + y, 0.5f + z,      0.0f, 0.0f,   SIDE_SHADE, SIDE_SHADE, SIDE_SHADE,
+           0.5f + x, -0.5f + y, -0.5f + z,     1.0f, 0.0f,   SIDE_SHADE, SIDE_SHADE, SIDE_SHADE,
+           0.5f + x, 0.5f + y, -0.5f + z,      1.0f, 1.0f,   SIDE_SHADE, SIDE_SHADE, SIDE_SHADE,
+           0.5f + x, 0.5f + y, 0.5f + z,       0.0f, 1.0f,   SIDE_SHADE, SIDE_SHADE, SIDE_SHADE
         };
 
-        for (int v = 0; v < 20; v++)
+        for (int v = 0; v < 32; v++)
         {
             this->vertices.push_back(right[v]);
         }
@@ -466,13 +474,13 @@ void Chunk::addBlockToMesh(int x, int y, int z, FaceRenderFlags faces)
     if (faces.yNeg)
     {
         float bottom[] = {
-            -0.5f + x, -0.5f + y, -0.5f + z,    0.0f, 1.0f,
-            0.5f + x, -0.5f + y, -0.5f + z,     1.0f, 1.0f,
-            0.5f + x, -0.5f + y, 0.5f + z,      1.0f, 0.0f,
-            -0.5f + x, -0.5f + y, 0.5f + z,     0.0f, 0.0f
+            -0.5f + x, -0.5f + y, -0.5f + z,    0.0f, 1.0f,     BOT_SHADE, BOT_SHADE, BOT_SHADE,
+            0.5f + x, -0.5f + y, -0.5f + z,     1.0f, 1.0f,     BOT_SHADE, BOT_SHADE, BOT_SHADE,
+            0.5f + x, -0.5f + y, 0.5f + z,      1.0f, 0.0f,     BOT_SHADE, BOT_SHADE, BOT_SHADE,
+            -0.5f + x, -0.5f + y, 0.5f + z,     0.0f, 0.0f,     BOT_SHADE, BOT_SHADE, BOT_SHADE
         };
 
-        for (int v = 0; v < 20; v++)
+        for (int v = 0; v < 32; v++)
         {
             this->vertices.push_back(bottom[v]);
         }
@@ -490,13 +498,13 @@ void Chunk::addBlockToMesh(int x, int y, int z, FaceRenderFlags faces)
     if (faces.yPos)
     {
         float top[] = {
-            0.5f + x, 0.5f + y, -0.5f + z,      1.0f, 1.0f,
-            -0.5f + x, 0.5f + y, -0.5f + z,     0.0f, 1.0f,
-            -0.5f + x, 0.5f + y, 0.5f + z,      0.0f, 0.0f,
-            0.5f + x, 0.5f + y, 0.5f + z,       1.0f, 0.0f
+            0.5f + x, 0.5f + y, -0.5f + z,      1.0f, 1.0f,     1.0f, 1.0f, 1.0f,
+            -0.5f + x, 0.5f + y, -0.5f + z,     0.0f, 1.0f,     1.0f, 1.0f, 1.0f,
+            -0.5f + x, 0.5f + y, 0.5f + z,      0.0f, 0.0f,     1.0f, 1.0f, 1.0f,
+            0.5f + x, 0.5f + y, 0.5f + z,       1.0f, 0.0f,     1.0f, 1.0f, 1.0f
         };
 
-        for (int v = 0; v < 20; v++)
+        for (int v = 0; v < 32; v++)
         {
             this->vertices.push_back(top[v]);
         }
@@ -514,13 +522,13 @@ void Chunk::addBlockToMesh(int x, int y, int z, FaceRenderFlags faces)
     if (faces.zNeg)
     {
         float front[] = {
-            0.5f + x, -0.5f + y, -0.5f + z,     0.0f, 0.0f,
-            -0.5f + x, -0.5f + y, -0.5f + z,    1.0f, 0.0f,
-            -0.5f + x, 0.5f + y, -0.5f + z,     1.0f, 1.0f,
-            0.5f + x, 0.5f + y, -0.5f + z,      0.0f, 1.0f
+            0.5f + x, -0.5f + y, -0.5f + z,     0.0f, 0.0f,     1.0f, 1.0f, 1.0f,
+            -0.5f + x, -0.5f + y, -0.5f + z,    1.0f, 0.0f,     1.0f, 1.0f, 1.0f,
+            -0.5f + x, 0.5f + y, -0.5f + z,     1.0f, 1.0f,     1.0f, 1.0f, 1.0f,
+            0.5f + x, 0.5f + y, -0.5f + z,      0.0f, 1.0f,     1.0f, 1.0f, 1.0f
         };
 
-        for (int v = 0; v < 20; v++)
+        for (int v = 0; v < 32; v++)
         {
             this->vertices.push_back(front[v]);
         }
@@ -538,13 +546,13 @@ void Chunk::addBlockToMesh(int x, int y, int z, FaceRenderFlags faces)
     if (faces.zPos)
     {
         float back[] = {
-            -0.5f + x, -0.5f + y, 0.5f + z,     0.0f, 0.0f,
-            0.5f + x, -0.5f + y, 0.5f + z,      1.0f, 0.0f,
-            0.5f + x, 0.5f + y, 0.5f + z,       1.0f, 1.0f,
-            -0.5f + x, 0.5f + y, 0.5f + z,      0.0f, 1.0f
+            -0.5f + x, -0.5f + y, 0.5f + z,     0.0f, 0.0f,     1.0f, 1.0f, 1.0f,
+            0.5f + x, -0.5f + y, 0.5f + z,      1.0f, 0.0f,     1.0f, 1.0f, 1.0f,
+            0.5f + x, 0.5f + y, 0.5f + z,       1.0f, 1.0f,     1.0f, 1.0f, 1.0f,
+            -0.5f + x, 0.5f + y, 0.5f + z,      0.0f, 1.0f,     1.0f, 1.0f, 1.0f
         };
 
-        for (int v = 0; v < 20; v++)
+        for (int v = 0; v < 32; v++)
         {
             this->vertices.push_back(back[v]);
         }
