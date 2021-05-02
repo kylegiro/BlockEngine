@@ -18,7 +18,7 @@ Engine::Engine(SDL_GLContext glContext, Window& window, Shader& shader)
     camera(glm::vec3(0.0f, 0.0f, 0.0f)),
     heightMap(),
     chunkManager(shader, texture, camera, heightMap),
-    gui(window.getSDLWindow(), glContext, chunkManager, heightMap)
+    gui(window.getSDLWindow(), glContext, chunkManager, heightMap, *this)
 {
     glEnable(GL_DEPTH_TEST);
 
@@ -119,6 +119,8 @@ void Engine::render()
     glUniformMatrix4fv(shader.getUniformLocation("projection"), 1, GL_FALSE, glm::value_ptr(projection));
 
     chunkManager.render();
+    if (isDebugMode())
+        chunkManager.renderDebug();
     gui.render(camera);
 
     window.render();
@@ -127,4 +129,14 @@ void Engine::render()
 void Engine::quit()
 {
     isQuit = true;
+}
+
+bool Engine::isDebugMode() const
+{
+    return debugMode;
+}
+
+bool* Engine::getDebugModeAdr()
+{
+    return &debugMode;
 }

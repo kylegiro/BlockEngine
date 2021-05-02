@@ -10,6 +10,7 @@
 
 #include "ChunkManager.h"
 #include "Util.h"
+#include "WorldGen.h"
 
 
 const float SIDE_SHADE = 0.8f;
@@ -22,6 +23,10 @@ Chunk::Chunk(int x, int y, int z, Texture& texture, NoiseMap& heightMap, Camera&
     glGenBuffers(1, &VBO);
     glGenBuffers(1, &EBO); 
 
+    glGenVertexArrays(1, &dVAO);
+    glGenBuffers(1, &dVBO);
+    glGenBuffers(1, &dEBO);
+
     blocks = new Block * *[CHUNK_SIZE];
     for (int i = 0; i < CHUNK_SIZE; i++)
     {
@@ -32,6 +37,40 @@ Chunk::Chunk(int x, int y, int z, Texture& texture, NoiseMap& heightMap, Camera&
         }
     }
     generateTerrain();
+
+    float dVerts[] = {
+        0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 1.0f, 0.0f, 0.0f,
+        0.0f, 16.0f, 0.0f, 0.0f, 0.0f, 1.0f, 0.0f, 0.0f,
+        16.0f, 0.0f, 0.0f, 0.0f, 0.0f, 1.0f, 0.0f, 0.0f,
+        0.0f, 0.0f, -16.0f, 0.0f, 0.0f, 1.0f, 0.0f, 0.0f,
+    };
+
+    unsigned int dIndices[] = {
+        0, 1,
+        0, 2,
+        0, 3
+    };
+
+    glBindVertexArray(dVAO);
+
+    glBindBuffer(GL_ARRAY_BUFFER, dVBO);
+    glBufferData(GL_ARRAY_BUFFER, sizeof(dVerts) / sizeof(dVerts[0]) * sizeof(float), &dVerts[0], GL_STREAM_DRAW);
+
+    glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, dEBO);
+    glBufferData(GL_ELEMENT_ARRAY_BUFFER, sizeof(dIndices) / sizeof(dIndices[0]) * sizeof(unsigned int), &dIndices[0], GL_STREAM_DRAW);
+
+    // position attribute
+    glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 8 * sizeof(float), (void*)0);
+    glEnableVertexAttribArray(0);
+
+    // texture coordinate attribute
+    glVertexAttribPointer(1, 2, GL_FLOAT, GL_FALSE, 8 * sizeof(float), (void*)(3 * sizeof(float)));
+    glEnableVertexAttribArray(1);
+
+    // color attribute
+    glVertexAttribPointer(2, 3, GL_FLOAT, GL_FALSE, 8 * sizeof(float), (void*)(5 * sizeof(float)));
+    glEnableVertexAttribArray(2);
+    glBindVertexArray(0);
 }
 
 Chunk::~Chunk()
@@ -49,6 +88,10 @@ Chunk::~Chunk()
     glDeleteVertexArrays(1, &VAO);
     glDeleteBuffers(1, &VBO);
     glDeleteBuffers(1, &EBO);
+
+    glDeleteVertexArrays(1, &dVAO);
+    glDeleteBuffers(1, &dVBO);
+    glDeleteBuffers(1, &dEBO);
 
 }
 
@@ -75,6 +118,20 @@ void Chunk::render(Shader& shader)
     glBindVertexArray(0);
 }
 
+void Chunk::renderDebug(Shader& shader)
+{
+    // transformations
+    glm::mat4 model = glm::mat4(1.0f);
+    model = glm::translate(model, glm::vec3(CHUNK_SIZE * (float)getX(), CHUNK_SIZE * (float)getY(), CHUNK_SIZE * (float)getZ()));
+    glUniformMatrix4fv(shader.getUniformLocation("model"), 1, GL_FALSE, glm::value_ptr(model));
+
+    glBindVertexArray(dVAO);
+    glPolygonMode(GL_FRONT_AND_BACK, GL_LINES);
+    glDrawElements(GL_LINES, 6, GL_UNSIGNED_INT, 0);
+    glPolygonMode(GL_FRONT_AND_BACK, GL_FILL);
+    glBindVertexArray(0);
+}
+
 void Chunk::generateTerrain()
 {
     int yWorld = getY() * CHUNK_SIZE;
@@ -90,7 +147,7 @@ void Chunk::generateTerrain()
                 double zWorld = (double) getZ() * CHUNK_SIZE + z;
                 yWorld = getY() * CHUNK_SIZE + y;
 
-                double height = 30 + 8.0 * heightMap.getValue(xWorld, zWorld);
+                double height = WorldGen::BASE_ELEVATION + (WorldGen::ELEVATION_VARIATION * heightMap.getValue(xWorld, zWorld));
 
                 if (yWorld > height) continue;
                 setBlock(x, y, z, Block::Type::STONE);
@@ -282,7 +339,7 @@ int Chunk::getZ() const
 
 bool Chunk::shouldRender()
 {
-    return true;
+    return !surrounded;
 }
 
 void Chunk::updateBorderFlags()

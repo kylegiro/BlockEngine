@@ -206,6 +206,7 @@
     <ClInclude Include="Texture.h" />
     <ClInclude Include="Util.h" />
     <ClInclude Include="Window.h" />
+    <ClInclude Include="WorldGen.h" />
   </ItemGroup>
   <ItemGroup>
     <Text Include="..\TODO.txt" />

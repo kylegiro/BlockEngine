@@ -7,12 +7,15 @@
 
 #include "Util.h"
 
+#include "Engine.h"
+
 // #define DEBUG_NEIGHBORS
 #define DEBUG_HEIGHTMAP
+//#define DEBUG_REBUILDCHUNK
 
 
-GUI::GUI(SDL_Window* window, SDL_GLContext glContext, ChunkManager& chunkManager, NoiseMap& heightMap)
-	: window(window), glContext(glContext), chunkManager(chunkManager), heightMap(heightMap)
+GUI::GUI(SDL_Window* window, SDL_GLContext glContext, ChunkManager& chunkManager, NoiseMap& heightMap, Engine& engine)
+	: window(window), glContext(glContext), chunkManager(chunkManager), heightMap(heightMap), engine(engine)
 {
 	ImGui::CreateContext();
 	
@@ -48,6 +51,8 @@ void GUI::render(Camera& camera)
 
 	ImGui::Text(hmss.str().c_str());
 #endif
+
+	ImGui::Checkbox("Render Debug", engine.getDebugModeAdr());
 
 
 #ifdef DEBUG_NEIGHBORS	
@@ -116,7 +121,7 @@ void GUI::render(Camera& camera)
 	}
 #endif
 
-
+#ifdef DEBUG_REBUILDCHUNK
 	if (ImGui::Button("Rebuild Chunk"))
 	{
 		glm::ivec3 pos = worldToChunk(camera.getPosition());
@@ -126,6 +131,7 @@ void GUI::render(Camera& camera)
 			chunk->setNeedsRebuild(false, true);
 			chunk->rebuildMesh(chunkManager);			
 	}
+#endif
 	ImGui::End();
 
 	ImGui::Render();

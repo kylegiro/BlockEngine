@@ -24,7 +24,10 @@ public:
 	void handleEvents();
 	void update(double dt);
 	void render();
-	void quit();	
+	void quit();
+
+	bool isDebugMode() const;
+	bool* getDebugModeAdr();
 
 private:
 	Window& window;
@@ -40,6 +43,7 @@ private:
 	MouseMode mouseMode = MouseMode::Camera;
 
 	bool isQuit = false;
+	bool debugMode = false;
 
 	NoiseMap heightMap;
 

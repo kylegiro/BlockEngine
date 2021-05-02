@@ -30,6 +30,7 @@ public:
 
 	void update(double dt);
 	void render(Shader& shader);
+	void renderDebug(Shader& shader);
 
 	void generateTerrain();
 
@@ -79,6 +80,7 @@ private:
 	void addBlockToMesh(int x, int y, int z, FaceRenderFlags faces);
 
 	unsigned int VBO, VAO, EBO;
+	unsigned int dVBO, dVAO, dEBO;
 
 	// Neighbors
 	int numNeighbors;

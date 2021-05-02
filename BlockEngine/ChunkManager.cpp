@@ -213,6 +213,30 @@ void ChunkManager::render()
     }
 }
 
+void ChunkManager::renderDebug()
+{
+    for (ChunkMap::iterator it = chunks.begin(); it != chunks.end(); it++)
+    {
+        Chunk* chunk = it->second;
+        if (chunk != nullptr)
+        {
+            int x = chunk->getX();
+            int y = chunk->getY();
+            int z = chunk->getZ();
+
+            float xPos = (float)x * CHUNK_SIZE;
+            float yPos = (float)y * CHUNK_SIZE;
+            float zPos = (float)z * CHUNK_SIZE;
+
+            glm::vec3 center = glm::vec3(xPos, yPos, zPos) + glm::vec3(CHUNK_SIZE * 0.5f, CHUNK_SIZE * 0.5f, CHUNK_SIZE * 0.5f);
+            float distance = glm::distance(center, camera.getPosition());
+
+            if(distance < CHUNK_SIZE * 3)
+                chunk->renderDebug(shader);
+        }            
+    }
+}
+
 Chunk* ChunkManager::getChunk(int x, int y, int z)
 {
     ChunkCoord coord = { x, y, z };

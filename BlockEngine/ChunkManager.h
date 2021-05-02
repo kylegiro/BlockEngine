@@ -43,6 +43,7 @@ public:
 	ChunkManager(Shader& shader, Texture& texture, Camera& camera, NoiseMap& heightMap);
 	void update(double dt);
 	void render();
+	void renderDebug();
 	Chunk* getChunk(int x, int y, int z);
 	void loadChunk(int x, int y, int z);
 	void unloadChunk(Chunk* chunk);
