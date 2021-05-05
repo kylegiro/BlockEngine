@@ -3,7 +3,8 @@
 #include <iostream>
 #include <algorithm>
 
-ChunkManager::ChunkManager(Shader& shader, Texture& texture, Camera& camera, NoiseMap& heightMap) : shader(shader), texture(texture), camera(camera), heightMap(heightMap)
+ChunkManager::ChunkManager(Shader& shader, Texture& texture, Camera& camera, Frustum& frustum, NoiseMap& heightMap) 
+    : shader(shader), texture(texture), camera(camera), frustum(frustum), heightMap(heightMap)
 {
     loadChunk(0, 0, 0);
 }
@@ -208,8 +209,11 @@ void ChunkManager::render()
     for (ChunkMap::iterator it = chunks.begin(); it != chunks.end(); it++)
     {
         Chunk* chunk = it->second;
-        if(chunk != nullptr)
-            chunk->render(shader);
+        if (chunk != nullptr)
+        {            
+            if(frustum.pointInFrustum(chunk->getCenterPos()))
+                chunk->render(shader);
+        }            
     }
 }
 

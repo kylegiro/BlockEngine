@@ -29,7 +29,7 @@ void Window::render()
 
 void Window::centerMouse()
 {
-    SDL_WarpMouseInWindow(sdlWindow, 400, 400);
+    SDL_WarpMouseInWindow(sdlWindow, width / 2, height / 2);
 }
 
 SDL_Window* Window::getSDLWindow()

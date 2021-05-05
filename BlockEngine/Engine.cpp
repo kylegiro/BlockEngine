@@ -11,13 +11,15 @@
 
 using namespace std::chrono;
 
-Engine::Engine(SDL_GLContext glContext, Window& window, Shader& shader)
-    : glContext(glContext),
-    window(window), shader(shader),
-    texture(),    
+Engine::Engine(SDL_GLContext glContext, Window& window)
+    : glContext(glContext),   
+    window(window),
+    shader("shader.vert", "shader.frag"),
+    texture(),
+    frustum(glm::perspective(glm::radians(90.0f), 1.0f, 0.1f, 100.0f)),
     camera(glm::vec3(0.0f, 0.0f, 0.0f)),
     heightMap(),
-    chunkManager(shader, texture, camera, heightMap),
+    chunkManager(shader, texture, camera, frustum, heightMap),
     gui(window.getSDLWindow(), glContext, chunkManager, heightMap, *this)
 {
     glEnable(GL_DEPTH_TEST);
@@ -83,6 +85,13 @@ void Engine::handleEvents()
                 }
 
             }
+            else if (event.key.keysym.scancode == SDL_SCANCODE_F)
+            {
+                glm::mat4 view = camera.getView();
+                glm::mat4 projection = glm::perspective(glm::radians(90.0f), 1.0f, 0.1f, 100.0f);
+
+                frustum = Frustum(projection * view);
+            }
         }       
 
         if (event.type == SDL_KEYDOWN || event.type == SDL_KEYUP)
@@ -113,8 +122,10 @@ void Engine::render()
     shader.use();
 
     glm::mat4 view = camera.getView();
-    glm::mat4 projection = glm::mat4(1.0f);
-    projection = glm::perspective(glm::radians(90.0f), 1.0f, 0.1f, 100.0f);
+    glm::mat4 projection = glm::perspective(glm::radians(90.0f), 1.0f, 0.1f, 100.0f);
+
+    //frustum = Frustum(view * projection);
+
     glUniformMatrix4fv(shader.getUniformLocation("view"), 1, GL_FALSE, glm::value_ptr(view));
     glUniformMatrix4fv(shader.getUniformLocation("projection"), 1, GL_FALSE, glm::value_ptr(projection));
 
@@ -139,4 +150,9 @@ bool Engine::isDebugMode() const
 bool* Engine::getDebugModeAdr()
 {
     return &debugMode;
+}
+
+Frustum& Engine::getFrustum()
+{
+    return frustum;
 }

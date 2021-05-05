@@ -9,6 +9,7 @@
 #include "ChunkManager.h"
 #include "GUI.h"
 #include "NoiseMap.h"
+#include "Frustum.h"
 
 enum class MouseMode
 {
@@ -19,7 +20,7 @@ enum class MouseMode
 class Engine
 {
 public:
-	Engine(SDL_GLContext glContext, Window& window, Shader& shader);
+	Engine(SDL_GLContext glContext, Window& window);
 	void init();
 	void handleEvents();
 	void update(double dt);
@@ -29,15 +30,18 @@ public:
 	bool isDebugMode() const;
 	bool* getDebugModeAdr();
 
+	Frustum& getFrustum();
+
 private:
 	Window& window;
-	Shader& shader;
+	Shader shader;
 
 	Camera camera;
+	Frustum frustum;
 	GUI gui;
 	SDL_GLContext glContext;
 
-	Texture texture;	
+	Texture texture;
 	ChunkManager chunkManager;
 
 	MouseMode mouseMode = MouseMode::Camera;

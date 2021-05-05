@@ -7,6 +7,7 @@
 #include "Shader.h"
 #include "Camera.h"
 #include "NoiseMap.h"
+#include "Frustum.h"
 
 const unsigned int LOAD_RADIUS = CHUNK_SIZE * 8;
 const unsigned int UNLOAD_RADIUS = LOAD_RADIUS + CHUNK_SIZE * 1;
@@ -40,7 +41,7 @@ typedef std::unordered_map<ChunkCoord, Chunk*, ChunkCoord::Hash> ChunkMap;
 class ChunkManager
 {
 public:
-	ChunkManager(Shader& shader, Texture& texture, Camera& camera, NoiseMap& heightMap);
+	ChunkManager(Shader& shader, Texture& texture, Camera& camera, Frustum& frustum, NoiseMap& heightMap);
 	void update(double dt);
 	void render();
 	void renderDebug();
@@ -55,6 +56,7 @@ private:
 	Shader& shader;
 	Texture& texture;
 	Camera& camera;
+	Frustum& frustum;
 	
 	NoiseMap& heightMap;
 };

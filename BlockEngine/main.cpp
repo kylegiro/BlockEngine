@@ -13,11 +13,9 @@ int main(int argc, char* args[])
 {
     Window window = Window("BlockEngine", 800, 800);
 
-    SDLManager sdlManager = SDLManager(window);    
+    SDLManager sdlManager = SDLManager(window);        
 
-    Shader shader = Shader("shader.vert", "shader.frag");
-
-    Engine engine(sdlManager.getContext(), window, shader);
+    Engine engine(sdlManager.getContext(), window);
 
     sdlManager.quit();
 

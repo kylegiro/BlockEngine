@@ -37,6 +37,8 @@ public:
 	Block getBlock(int x, int y, int z);
 	void setBlock(int x, int y, int z, Block::Type type);
 
+	glm::vec3 getCenterPos();
+
 	int getX() const;
 	int getY() const;
 	int getZ() const;

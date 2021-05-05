@@ -12,6 +12,7 @@
 // #define DEBUG_NEIGHBORS
 #define DEBUG_HEIGHTMAP
 //#define DEBUG_REBUILDCHUNK
+#define DEBUG_FRUSTUM
 
 
 GUI::GUI(SDL_Window* window, SDL_GLContext glContext, ChunkManager& chunkManager, NoiseMap& heightMap, Engine& engine)
@@ -51,6 +52,14 @@ void GUI::render(Camera& camera)
 
 	ImGui::Text(hmss.str().c_str());
 #endif
+
+#ifdef DEBUG_FRUSTUM
+	bool inFrustum = engine.getFrustum().pointInFrustum(camera.getPosition());
+	std::string frustumText = inFrustum ? "In frustum: TRUE" : "In frustum: FALSE";
+	ImGui::Text(frustumText.c_str());
+	ImGui::Text(engine.getFrustum().toString().c_str());
+#endif
+
 
 	ImGui::Checkbox("Render Debug", engine.getDebugModeAdr());
 
@@ -132,6 +141,7 @@ void GUI::render(Camera& camera)
 			chunk->rebuildMesh(chunkManager);			
 	}
 #endif
+
 	ImGui::End();
 
 	ImGui::Render();

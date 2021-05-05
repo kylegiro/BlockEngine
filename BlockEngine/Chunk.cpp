@@ -166,6 +166,11 @@ void Chunk::setBlock(int x, int y, int z, Block::Type type)
     blocks[x][y][z].setType(type);
 }
 
+glm::vec3 Chunk::getCenterPos()
+{
+    return glm::vec3(x * CHUNK_SIZE + (CHUNK_SIZE/2), y * CHUNK_SIZE + (CHUNK_SIZE / 2), z * CHUNK_SIZE + (CHUNK_SIZE / 2));
+}
+
 void Chunk::rebuildMesh(ChunkManager& chunkManager)
 {
     glNextIndex = 0;
