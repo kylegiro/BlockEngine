@@ -10,9 +10,9 @@
 #include "Engine.h"
 
 // #define DEBUG_NEIGHBORS
-#define DEBUG_HEIGHTMAP
+//#define DEBUG_HEIGHTMAP
 //#define DEBUG_REBUILDCHUNK
-#define DEBUG_FRUSTUM
+//#define DEBUG_FRUSTUM
 
 
 GUI::GUI(SDL_Window* window, SDL_GLContext glContext, ChunkManager& chunkManager, NoiseMap& heightMap, Engine& engine)

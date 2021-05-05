@@ -9,6 +9,7 @@ class Frustum
 public:
 	Frustum(glm::mat4 projection);
 	bool pointInFrustum(glm::vec3 point);
+	bool cubeInFrustum(glm::vec3 center, float size);
 	std::string toString();
 
 public:

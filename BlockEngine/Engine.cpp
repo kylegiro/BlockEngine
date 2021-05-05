@@ -85,13 +85,6 @@ void Engine::handleEvents()
                 }
 
             }
-            else if (event.key.keysym.scancode == SDL_SCANCODE_F)
-            {
-                glm::mat4 view = camera.getView();
-                glm::mat4 projection = glm::perspective(glm::radians(90.0f), 1.0f, 0.1f, 100.0f);
-
-                frustum = Frustum(projection * view);
-            }
         }       
 
         if (event.type == SDL_KEYDOWN || event.type == SDL_KEYUP)
@@ -124,7 +117,7 @@ void Engine::render()
     glm::mat4 view = camera.getView();
     glm::mat4 projection = glm::perspective(glm::radians(90.0f), 1.0f, 0.1f, 100.0f);
 
-    //frustum = Frustum(view * projection);
+    frustum = Frustum(projection * view);
 
     glUniformMatrix4fv(shader.getUniformLocation("view"), 1, GL_FALSE, glm::value_ptr(view));
     glUniformMatrix4fv(shader.getUniformLocation("projection"), 1, GL_FALSE, glm::value_ptr(projection));

@@ -210,9 +210,21 @@ void ChunkManager::render()
     {
         Chunk* chunk = it->second;
         if (chunk != nullptr)
-        {            
-            if(frustum.pointInFrustum(chunk->getCenterPos()))
+        {          
+            // don't do frustum culling for very near chunks
+            // cubeInFrustum only checks if any of the 8 vertices of the cube are within the frustum
+            // so this leads to chunks being culled when they shouldn't if none of the chunk vertices are visible but edge blocks are
+            float distance = glm::distance(chunk->getCenterPos(), camera.getPosition());
+            if (distance >= CHUNK_SIZE*2)
+            {
+                if (frustum.cubeInFrustum(chunk->getCenterPos(), 8))
+                    chunk->render(shader);
+            }
+            else 
+            {
                 chunk->render(shader);
+            }
+
         }            
     }
 }

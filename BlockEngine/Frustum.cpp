@@ -66,6 +66,32 @@ bool Frustum::pointInFrustum(glm::vec3 point)
 	return true;
 }
 
+bool Frustum::cubeInFrustum(glm::vec3 center, float size)
+{
+	// check center first
+	if (pointInFrustum(center))
+		return true;
+	// then corners
+	if (pointInFrustum(center + glm::vec3(size, size, size)))
+		return true;
+	if (pointInFrustum(center + glm::vec3(-size, size, size)))
+		return true;
+	if (pointInFrustum(center + glm::vec3(size, -size, size)))
+		return true;
+	if (pointInFrustum(center + glm::vec3(size, size, -size)))
+		return true;
+	if (pointInFrustum(center + glm::vec3(-size, -size, size)))
+		return true;
+	if (pointInFrustum(center + glm::vec3(size, -size, -size)))
+		return true;
+	if (pointInFrustum(center + glm::vec3(-size, size, -size)))
+		return true;
+	if (pointInFrustum(center + glm::vec3(-size, -size, -size)))
+		return true;
+
+	return false;
+}
+
 std::string Frustum::toString()
 {
 	std::ostringstream ss;
