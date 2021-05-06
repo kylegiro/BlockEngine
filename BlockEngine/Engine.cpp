@@ -15,11 +15,11 @@ Engine::Engine(SDL_GLContext glContext, Window& window)
     : glContext(glContext),   
     window(window),
     shader("shader.vert", "shader.frag"),
-    texture(),
+    atlas(256, 256, "textures/atlas.png"),
     frustum(glm::perspective(glm::radians(90.0f), 1.0f, 0.1f, 100.0f)),
     camera(glm::vec3(0.0f, 0.0f, 0.0f)),
     heightMap(),
-    chunkManager(shader, texture, camera, frustum, heightMap),
+    chunkManager(shader, atlas, camera, frustum, heightMap),
     gui(window.getSDLWindow(), glContext, chunkManager, heightMap, *this)
 {
     glEnable(GL_DEPTH_TEST);

@@ -2,7 +2,7 @@
 
 #include "Shader.h"
 #include "Block.h"
-#include "Texture.h"
+#include "TextureAtlas.h"
 #include "NoiseMap.h"
 #include "Camera.h"
 
@@ -25,7 +25,7 @@ struct FaceRenderFlags
 class Chunk
 {
 public:
-	Chunk(int x, int y, int z, Texture& texture, NoiseMap& heightMap, Camera& camera);
+	Chunk(int x, int y, int z, TextureAtlas& atlas, NoiseMap& heightMap, Camera& camera);
 	~Chunk();
 
 	void update(double dt);
@@ -74,12 +74,12 @@ public:
 
 private:
 	Block*** blocks;
-	Texture& texture;
+	TextureAtlas& atlas;
 	std::vector<float> vertices;
 	std::vector<unsigned int> indices;
 	unsigned int glNextIndex = 0;
 
-	void addBlockToMesh(int x, int y, int z, FaceRenderFlags faces);
+	void addBlockToMesh(int x, int y, int z, FaceRenderFlags faces, Block::Type type);
 
 	unsigned int VBO, VAO, EBO;
 	unsigned int dVBO, dVAO, dEBO;

@@ -10,6 +10,7 @@
 #include "GUI.h"
 #include "NoiseMap.h"
 #include "Frustum.h"
+#include "TextureAtlas.h"
 
 enum class MouseMode
 {
@@ -41,7 +42,7 @@ private:
 	GUI gui;
 	SDL_GLContext glContext;
 
-	Texture texture;
+	TextureAtlas atlas;
 	ChunkManager chunkManager;
 
 	MouseMode mouseMode = MouseMode::Camera;

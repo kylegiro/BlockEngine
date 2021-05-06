@@ -8,7 +8,8 @@ class Block
 public:
 	enum Type {
 		AIR = 0,
-		STONE = 1
+		STONE = 1,
+		DIRT = 2
 	};
 
 	Block();
@@ -16,6 +17,8 @@ public:
 	Type getType();
 	void setType(Type type);
 	bool isOpaque();
+
+	static std::string getAtlasKey(Block::Type type);
 
 private:
 	Type type;

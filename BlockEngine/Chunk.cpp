@@ -16,8 +16,8 @@
 const float SIDE_SHADE = 0.8f;
 const float BOT_SHADE = 0.8f;
 
-Chunk::Chunk(int x, int y, int z, Texture& texture, NoiseMap& heightMap, Camera& camera) 
-    : x(x), y(y), z(z), texture(texture), numNeighbors(0), heightMap(heightMap), camera(camera)
+Chunk::Chunk(int x, int y, int z, TextureAtlas& atlas, NoiseMap& heightMap, Camera& camera) 
+    : x(x), y(y), z(z), atlas(atlas), numNeighbors(0), heightMap(heightMap), camera(camera)
 {
     glGenVertexArrays(1, &VAO);
     glGenBuffers(1, &VBO);
@@ -101,12 +101,11 @@ void Chunk::update(double dt)
 
 void Chunk::render(Shader& shader)
 {
-    //if (surrounded)
-    //   return;
+    if (!shouldRender())
+        return;
 
-    // bind texture
-    glUniform1i(shader.getUniformLocation("tex"), 0);
-    texture.bind();
+    // bind texture   
+    atlas.bind();
 
     // transformations
     glm::mat4 model = glm::mat4(1.0f);
@@ -236,7 +235,7 @@ void Chunk::rebuildMesh(ChunkManager& chunkManager)
                     faces.zPos = !blocks[x][y][z + 1].isOpaque();
                 }
 
-                addBlockToMesh(x, y, z, faces);
+                addBlockToMesh(x, y, z, faces, blocks[x][y][z].getType());
 			}			           
 		}
 	}
@@ -505,15 +504,20 @@ int Chunk::getNumNeighbors()
     return numNeighbors;
 }
 
-void Chunk::addBlockToMesh(int x, int y, int z, FaceRenderFlags faces)
+void Chunk::addBlockToMesh(int x, int y, int z, FaceRenderFlags faces, Block::Type type)
 {    
+
+    
+    std::string atlasKey = Block::getAtlasKey(type);
+    UV uv = atlas.getUV(atlasKey);
+
     if (faces.xNeg)
     {
         float left[] = {
-            -0.5f + x, -0.5f + y, -0.5f + z,    0.0f, 0.0f,     SIDE_SHADE, SIDE_SHADE, SIDE_SHADE,
-            -0.5f + x, -0.5f + y, 0.5f + z,     1.0f, 0.0f,     SIDE_SHADE, SIDE_SHADE, SIDE_SHADE,
-            -0.5f + x, 0.5f + y, 0.5f + z,      1.0f, 1.0f,     SIDE_SHADE, SIDE_SHADE, SIDE_SHADE,
-            -0.5f + x, 0.5f + y, -0.5f + z,     0.0f, 1.0f,     SIDE_SHADE, SIDE_SHADE, SIDE_SHADE
+            -0.5f + x, -0.5f + y, -0.5f + z,    uv.bottomLeft.x, uv.bottomLeft.y,       SIDE_SHADE, SIDE_SHADE, SIDE_SHADE,
+            -0.5f + x, -0.5f + y, 0.5f + z,     uv.bottomRight.x, uv.bottomRight.y,     SIDE_SHADE, SIDE_SHADE, SIDE_SHADE,
+            -0.5f + x, 0.5f + y, 0.5f + z,      uv.topRight.x, uv.topRight.y,           SIDE_SHADE, SIDE_SHADE, SIDE_SHADE,
+            -0.5f + x, 0.5f + y, -0.5f + z,     uv.topLeft.x, uv.topLeft.y,             SIDE_SHADE, SIDE_SHADE, SIDE_SHADE
         };
 
         for (int v = 0; v < 32; v++)
@@ -534,10 +538,10 @@ void Chunk::addBlockToMesh(int x, int y, int z, FaceRenderFlags faces)
     if (faces.xPos)
     {
         float right[] = {
-           0.5f + x, -0.5f + y, 0.5f + z,      0.0f, 0.0f,   SIDE_SHADE, SIDE_SHADE, SIDE_SHADE,
-           0.5f + x, -0.5f + y, -0.5f + z,     1.0f, 0.0f,   SIDE_SHADE, SIDE_SHADE, SIDE_SHADE,
-           0.5f + x, 0.5f + y, -0.5f + z,      1.0f, 1.0f,   SIDE_SHADE, SIDE_SHADE, SIDE_SHADE,
-           0.5f + x, 0.5f + y, 0.5f + z,       0.0f, 1.0f,   SIDE_SHADE, SIDE_SHADE, SIDE_SHADE
+           0.5f + x, -0.5f + y, 0.5f + z,      uv.bottomLeft.x, uv.bottomLeft.y,        SIDE_SHADE, SIDE_SHADE, SIDE_SHADE,
+           0.5f + x, -0.5f + y, -0.5f + z,     uv.bottomRight.x, uv.bottomRight.y,      SIDE_SHADE, SIDE_SHADE, SIDE_SHADE,
+           0.5f + x, 0.5f + y, -0.5f + z,      uv.topRight.x, uv.topRight.y,            SIDE_SHADE, SIDE_SHADE, SIDE_SHADE,
+           0.5f + x, 0.5f + y, 0.5f + z,       uv.topLeft.x, uv.topLeft.y,              SIDE_SHADE, SIDE_SHADE, SIDE_SHADE
         };
 
         for (int v = 0; v < 32; v++)
@@ -558,10 +562,10 @@ void Chunk::addBlockToMesh(int x, int y, int z, FaceRenderFlags faces)
     if (faces.yNeg)
     {
         float bottom[] = {
-            -0.5f + x, -0.5f + y, -0.5f + z,    0.0f, 1.0f,     BOT_SHADE, BOT_SHADE, BOT_SHADE,
-            0.5f + x, -0.5f + y, -0.5f + z,     1.0f, 1.0f,     BOT_SHADE, BOT_SHADE, BOT_SHADE,
-            0.5f + x, -0.5f + y, 0.5f + z,      1.0f, 0.0f,     BOT_SHADE, BOT_SHADE, BOT_SHADE,
-            -0.5f + x, -0.5f + y, 0.5f + z,     0.0f, 0.0f,     BOT_SHADE, BOT_SHADE, BOT_SHADE
+            -0.5f + x, -0.5f + y, -0.5f + z,    uv.topLeft.x, uv.topLeft.y,              BOT_SHADE, BOT_SHADE, BOT_SHADE,
+            0.5f + x, -0.5f + y, -0.5f + z,     uv.topRight.x, uv.topRight.y,            BOT_SHADE, BOT_SHADE, BOT_SHADE,
+            0.5f + x, -0.5f + y, 0.5f + z,      uv.bottomRight.x, uv.bottomRight.y,      BOT_SHADE, BOT_SHADE, BOT_SHADE,
+            -0.5f + x, -0.5f + y, 0.5f + z,     uv.bottomLeft.x, uv.bottomLeft.y,        BOT_SHADE, BOT_SHADE, BOT_SHADE
         };
 
         for (int v = 0; v < 32; v++)
@@ -582,10 +586,10 @@ void Chunk::addBlockToMesh(int x, int y, int z, FaceRenderFlags faces)
     if (faces.yPos)
     {
         float top[] = {
-            0.5f + x, 0.5f + y, -0.5f + z,      1.0f, 1.0f,     1.0f, 1.0f, 1.0f,
-            -0.5f + x, 0.5f + y, -0.5f + z,     0.0f, 1.0f,     1.0f, 1.0f, 1.0f,
-            -0.5f + x, 0.5f + y, 0.5f + z,      0.0f, 0.0f,     1.0f, 1.0f, 1.0f,
-            0.5f + x, 0.5f + y, 0.5f + z,       1.0f, 0.0f,     1.0f, 1.0f, 1.0f
+            0.5f + x, 0.5f + y, -0.5f + z,      uv.topRight.x, uv.topRight.y,               1.0f, 1.0f, 1.0f,
+            -0.5f + x, 0.5f + y, -0.5f + z,     uv.topLeft.x, uv.topLeft.y,               1.0f, 1.0f, 1.0f,
+            -0.5f + x, 0.5f + y, 0.5f + z,      uv.bottomLeft.x, uv.bottomLeft.y,           1.0f, 1.0f, 1.0f,
+            0.5f + x, 0.5f + y, 0.5f + z,       uv.bottomRight.x, uv.bottomRight.y,         1.0f, 1.0f, 1.0f
         };
 
         for (int v = 0; v < 32; v++)
@@ -606,10 +610,10 @@ void Chunk::addBlockToMesh(int x, int y, int z, FaceRenderFlags faces)
     if (faces.zNeg)
     {
         float front[] = {
-            0.5f + x, -0.5f + y, -0.5f + z,     0.0f, 0.0f,     1.0f, 1.0f, 1.0f,
-            -0.5f + x, -0.5f + y, -0.5f + z,    1.0f, 0.0f,     1.0f, 1.0f, 1.0f,
-            -0.5f + x, 0.5f + y, -0.5f + z,     1.0f, 1.0f,     1.0f, 1.0f, 1.0f,
-            0.5f + x, 0.5f + y, -0.5f + z,      0.0f, 1.0f,     1.0f, 1.0f, 1.0f
+            0.5f + x, -0.5f + y, -0.5f + z,     uv.bottomLeft.x, uv.bottomLeft.y,           1.0f, 1.0f, 1.0f,
+            -0.5f + x, -0.5f + y, -0.5f + z,    uv.bottomRight.x, uv.bottomRight.y,         1.0f, 1.0f, 1.0f,
+            -0.5f + x, 0.5f + y, -0.5f + z,     uv.topRight.x, uv.topRight.y,               1.0f, 1.0f, 1.0f,
+            0.5f + x, 0.5f + y, -0.5f + z,      uv.topLeft.x, uv.topLeft.y,               1.0f, 1.0f, 1.0f
         };
 
         for (int v = 0; v < 32; v++)
@@ -630,10 +634,10 @@ void Chunk::addBlockToMesh(int x, int y, int z, FaceRenderFlags faces)
     if (faces.zPos)
     {
         float back[] = {
-            -0.5f + x, -0.5f + y, 0.5f + z,     0.0f, 0.0f,     1.0f, 1.0f, 1.0f,
-            0.5f + x, -0.5f + y, 0.5f + z,      1.0f, 0.0f,     1.0f, 1.0f, 1.0f,
-            0.5f + x, 0.5f + y, 0.5f + z,       1.0f, 1.0f,     1.0f, 1.0f, 1.0f,
-            -0.5f + x, 0.5f + y, 0.5f + z,      0.0f, 1.0f,     1.0f, 1.0f, 1.0f
+            -0.5f + x, -0.5f + y, 0.5f + z,     uv.bottomLeft.x, uv.bottomLeft.y,       1.0f, 1.0f, 1.0f,
+            0.5f + x, -0.5f + y, 0.5f + z,      uv.bottomRight.x, uv.bottomRight.y,     1.0f, 1.0f, 1.0f,
+            0.5f + x, 0.5f + y, 0.5f + z,       uv.topRight.x, uv.topRight.y,           1.0f, 1.0f, 1.0f,
+            -0.5f + x, 0.5f + y, 0.5f + z,      uv.topLeft.x, uv.topLeft.y,           1.0f, 1.0f, 1.0f
         };
 
         for (int v = 0; v < 32; v++)

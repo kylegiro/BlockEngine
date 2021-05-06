@@ -1,9 +1,11 @@
 #pragma once
 
+#include <string>
+
 class Texture
 {
 public:
-	Texture();
+	Texture(std::string path);
 	void bind();
 
 private:

@@ -3,8 +3,8 @@
 #include <iostream>
 #include <algorithm>
 
-ChunkManager::ChunkManager(Shader& shader, Texture& texture, Camera& camera, Frustum& frustum, NoiseMap& heightMap) 
-    : shader(shader), texture(texture), camera(camera), frustum(frustum), heightMap(heightMap)
+ChunkManager::ChunkManager(Shader& shader, TextureAtlas& atlas, Camera& camera, Frustum& frustum, NoiseMap& heightMap) 
+    : shader(shader), atlas(atlas), camera(camera), frustum(frustum), heightMap(heightMap)
 {
     loadChunk(0, 0, 0);
 }
@@ -268,7 +268,7 @@ Chunk* ChunkManager::getChunk(int x, int y, int z)
 void ChunkManager::loadChunk(int x, int y, int z)
 {
     ChunkCoord coord = { x, y, z };
-    Chunk* chunk = new Chunk(x, y, z, texture, heightMap, camera);
+    Chunk* chunk = new Chunk(x, y, z, atlas, heightMap, camera);
     chunks[coord] = chunk;    
     //problem here. rebuildmnesh works but setneedsrebuild causes weird issues            
     updateNeighbors(chunk, x, y, z);
