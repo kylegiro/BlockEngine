@@ -5,6 +5,8 @@ TextureAtlas::TextureAtlas(unsigned int width, unsigned int height, std::string 
 {	
 	map["stone"] = AtlasTexture{ 0, 0, 16, 16 };
 	map["dirt"] = AtlasTexture{ 16, 0, 16, 16 };
+	map["grass_side"] = AtlasTexture{ 32, 0, 16, 16 };
+	map["grass_top"] = AtlasTexture{ 48, 0, 16, 16 };
 }
 
 UV TextureAtlas::getUV(std::string key)

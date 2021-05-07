@@ -147,9 +147,14 @@ void Chunk::generateTerrain()
                 yWorld = getY() * CHUNK_SIZE + y;
 
                 double height = WorldGen::BASE_ELEVATION + (WorldGen::ELEVATION_VARIATION * heightMap.getValue(xWorld, zWorld));
-
                 if (yWorld > height) continue;
-                setBlock(x, y, z, Block::Type::STONE);
+
+                if(yWorld == (int) height)
+                    setBlock(x, y, z, Block::Type::GRASS);
+                else if(yWorld >= height - 3 && yWorld < height - 1)
+                    setBlock(x, y, z, Block::Type::DIRT);
+                else 
+                    setBlock(x, y, z, Block::Type::STONE);
             }
         }
     }
@@ -235,7 +240,7 @@ void Chunk::rebuildMesh(ChunkManager& chunkManager)
                     faces.zPos = !blocks[x][y][z + 1].isOpaque();
                 }
 
-                addBlockToMesh(x, y, z, faces, blocks[x][y][z].getType());
+                addBlockToMesh(x, y, z, faces, &blocks[x][y][z]);
 			}			           
 		}
 	}
@@ -504,12 +509,12 @@ int Chunk::getNumNeighbors()
     return numNeighbors;
 }
 
-void Chunk::addBlockToMesh(int x, int y, int z, FaceRenderFlags faces, Block::Type type)
+void Chunk::addBlockToMesh(int x, int y, int z, FaceRenderFlags faces, Block* block)
 {    
 
     
-    std::string atlasKey = Block::getAtlasKey(type);
-    UV uv = atlas.getUV(atlasKey);
+    std::string textureKey = block->getTextureSide();
+    UV uv = atlas.getUV(textureKey);
 
     if (faces.xNeg)
     {
@@ -547,54 +552,6 @@ void Chunk::addBlockToMesh(int x, int y, int z, FaceRenderFlags faces, Block::Ty
         for (int v = 0; v < 32; v++)
         {
             this->vertices.push_back(right[v]);
-        }
-
-        indices.push_back(glNextIndex);
-        indices.push_back(glNextIndex + 1);
-        indices.push_back(glNextIndex + 2);
-
-        indices.push_back(glNextIndex);
-        indices.push_back(glNextIndex + 2);
-        indices.push_back(glNextIndex + 3);
-
-        glNextIndex += 4;
-    }
-    if (faces.yNeg)
-    {
-        float bottom[] = {
-            -0.5f + x, -0.5f + y, -0.5f + z,    uv.topLeft.x, uv.topLeft.y,              BOT_SHADE, BOT_SHADE, BOT_SHADE,
-            0.5f + x, -0.5f + y, -0.5f + z,     uv.topRight.x, uv.topRight.y,            BOT_SHADE, BOT_SHADE, BOT_SHADE,
-            0.5f + x, -0.5f + y, 0.5f + z,      uv.bottomRight.x, uv.bottomRight.y,      BOT_SHADE, BOT_SHADE, BOT_SHADE,
-            -0.5f + x, -0.5f + y, 0.5f + z,     uv.bottomLeft.x, uv.bottomLeft.y,        BOT_SHADE, BOT_SHADE, BOT_SHADE
-        };
-
-        for (int v = 0; v < 32; v++)
-        {
-            this->vertices.push_back(bottom[v]);
-        }
-
-        indices.push_back(glNextIndex);
-        indices.push_back(glNextIndex + 1);
-        indices.push_back(glNextIndex + 2);
-
-        indices.push_back(glNextIndex);
-        indices.push_back(glNextIndex + 2);
-        indices.push_back(glNextIndex + 3);
-
-        glNextIndex += 4;
-    }
-    if (faces.yPos)
-    {
-        float top[] = {
-            0.5f + x, 0.5f + y, -0.5f + z,      uv.topRight.x, uv.topRight.y,               1.0f, 1.0f, 1.0f,
-            -0.5f + x, 0.5f + y, -0.5f + z,     uv.topLeft.x, uv.topLeft.y,               1.0f, 1.0f, 1.0f,
-            -0.5f + x, 0.5f + y, 0.5f + z,      uv.bottomLeft.x, uv.bottomLeft.y,           1.0f, 1.0f, 1.0f,
-            0.5f + x, 0.5f + y, 0.5f + z,       uv.bottomRight.x, uv.bottomRight.y,         1.0f, 1.0f, 1.0f
-        };
-
-        for (int v = 0; v < 32; v++)
-        {
-            this->vertices.push_back(top[v]);
         }
 
         indices.push_back(glNextIndex);
@@ -646,12 +603,68 @@ void Chunk::addBlockToMesh(int x, int y, int z, FaceRenderFlags faces, Block::Ty
         }
 
         indices.push_back(glNextIndex);
-        indices.push_back(glNextIndex+1);
-        indices.push_back(glNextIndex+2);
+        indices.push_back(glNextIndex + 1);
+        indices.push_back(glNextIndex + 2);
 
         indices.push_back(glNextIndex);
-        indices.push_back(glNextIndex+2);
-        indices.push_back(glNextIndex+3);
+        indices.push_back(glNextIndex + 2);
+        indices.push_back(glNextIndex + 3);
+
+        glNextIndex += 4;
+    }
+
+    textureKey = block->getTextureBottom();
+    uv = atlas.getUV(textureKey);
+
+    if (faces.yNeg)
+    {
+        float bottom[] = {
+            -0.5f + x, -0.5f + y, -0.5f + z,    uv.topLeft.x, uv.topLeft.y,              BOT_SHADE, BOT_SHADE, BOT_SHADE,
+            0.5f + x, -0.5f + y, -0.5f + z,     uv.topRight.x, uv.topRight.y,            BOT_SHADE, BOT_SHADE, BOT_SHADE,
+            0.5f + x, -0.5f + y, 0.5f + z,      uv.bottomRight.x, uv.bottomRight.y,      BOT_SHADE, BOT_SHADE, BOT_SHADE,
+            -0.5f + x, -0.5f + y, 0.5f + z,     uv.bottomLeft.x, uv.bottomLeft.y,        BOT_SHADE, BOT_SHADE, BOT_SHADE
+        };
+
+        for (int v = 0; v < 32; v++)
+        {
+            this->vertices.push_back(bottom[v]);
+        }
+
+        indices.push_back(glNextIndex);
+        indices.push_back(glNextIndex + 1);
+        indices.push_back(glNextIndex + 2);
+
+        indices.push_back(glNextIndex);
+        indices.push_back(glNextIndex + 2);
+        indices.push_back(glNextIndex + 3);
+
+        glNextIndex += 4;
+    }
+
+    textureKey = block->getTextureTop();
+    uv = atlas.getUV(textureKey);
+
+    if (faces.yPos)
+    {
+        float top[] = {
+            0.5f + x, 0.5f + y, -0.5f + z,      uv.topRight.x, uv.topRight.y,               1.0f, 1.0f, 1.0f,
+            -0.5f + x, 0.5f + y, -0.5f + z,     uv.topLeft.x, uv.topLeft.y,               1.0f, 1.0f, 1.0f,
+            -0.5f + x, 0.5f + y, 0.5f + z,      uv.bottomLeft.x, uv.bottomLeft.y,           1.0f, 1.0f, 1.0f,
+            0.5f + x, 0.5f + y, 0.5f + z,       uv.bottomRight.x, uv.bottomRight.y,         1.0f, 1.0f, 1.0f
+        };
+
+        for (int v = 0; v < 32; v++)
+        {
+            this->vertices.push_back(top[v]);
+        }
+
+        indices.push_back(glNextIndex);
+        indices.push_back(glNextIndex + 1);
+        indices.push_back(glNextIndex + 2);
+
+        indices.push_back(glNextIndex);
+        indices.push_back(glNextIndex + 2);
+        indices.push_back(glNextIndex + 3);
 
         glNextIndex += 4;
     }

@@ -79,7 +79,7 @@ private:
 	std::vector<unsigned int> indices;
 	unsigned int glNextIndex = 0;
 
-	void addBlockToMesh(int x, int y, int z, FaceRenderFlags faces, Block::Type type);
+	void addBlockToMesh(int x, int y, int z, FaceRenderFlags faces, Block* block);
 
 	unsigned int VBO, VAO, EBO;
 	unsigned int dVBO, dVAO, dEBO;

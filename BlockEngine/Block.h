@@ -9,7 +9,8 @@ public:
 	enum Type {
 		AIR = 0,
 		STONE = 1,
-		DIRT = 2
+		DIRT = 2,
+		GRASS = 3
 	};
 
 	Block();
@@ -18,7 +19,9 @@ public:
 	void setType(Type type);
 	bool isOpaque();
 
-	static std::string getAtlasKey(Block::Type type);
+	std::string getTextureSide();
+	std::string getTextureTop();
+	std::string getTextureBottom();	
 
 private:
 	Type type;

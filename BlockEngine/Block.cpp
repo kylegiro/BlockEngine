@@ -23,7 +23,7 @@ bool Block::isOpaque()
     return type != AIR;
 }
 
-std::string Block::getAtlasKey(Block::Type type)
+std::string Block::getTextureSide()
 {
     switch (type)
     {
@@ -31,5 +31,23 @@ std::string Block::getAtlasKey(Block::Type type)
         return "stone";
     case DIRT:
         return "dirt";
+    case GRASS:
+        return "grass_side";
+    default:
+        return "stone";
     }
+}
+
+std::string Block::getTextureTop()
+{
+    if (type != GRASS)
+        return getTextureSide();
+    return "grass_top";
+}
+
+std::string Block::getTextureBottom()
+{
+    if (type != GRASS)
+        return getTextureSide();
+    return "dirt";
 }
