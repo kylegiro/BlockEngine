@@ -163,7 +163,7 @@ void GUI::updateCameraPositionLabel(Camera& camera)
 	ss.str(std::string());
 	
 
-	glm::ivec3 chunkCoord = worldToChunk(position);
+	glm::ivec3 chunkCoord = chunkAtBlock(blockAt(position));
 	ss << "Chunk: (" << chunkCoord.x << "," << chunkCoord.y << "," << chunkCoord.z << ")";
 	chunkPos = ss.str();
 	ss.str(std::string());

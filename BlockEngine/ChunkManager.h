@@ -49,7 +49,10 @@ public:
 	Chunk* getChunk(int x, int y, int z);
 	void loadChunk(int x, int y, int z);
 	void unloadChunk(Chunk* chunk);
-	void updateNeighbors(Chunk* chunk, int x, int y, int z);	
+	void updateNeighbors(Chunk* chunk, int x, int y, int z);
+
+	Block getBlock(int x, int y, int z);
+	void setBlock(int x, int y, int z, Block::Type type);
 
 private:
 	ChunkMap chunks;

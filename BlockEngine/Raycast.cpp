@@ -5,9 +5,10 @@
 Raycast::Raycast(glm::vec3 origin, glm::vec3 direction, float length)
 	: origin(origin), direction(direction), length(length)
 {
-	int x = origin.x;
-	int y = origin.y;
-	int z = origin.z;
+	glm::ivec3 block = blockAt(origin);
+	int x = block.x;
+	int y = block.y;
+	int z = block.z;
 
 	int stepX = direction.x < 0 ? -1 : 1;
 	int stepY = direction.y < 0 ? -1 : 1;

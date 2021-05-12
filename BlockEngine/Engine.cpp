@@ -1,6 +1,7 @@
 #include "Engine.h"
 #include "Texture.h"
 #include "Raycast.h"
+#include "Util.h"
 
 #include <glad/glad.h>
 #include <glm/glm.hpp>
@@ -103,13 +104,37 @@ void Engine::handleEvents()
         {
             if (event.button.button == SDL_BUTTON_LEFT)
             {
-                Raycast raycast(camera.getPosition(), camera.getFront(), 10.0f);
+                glm::ivec3 block = blockAt(camera.getPosition());
+                std::cout << "(" << block.x << "," << block.y << "," << block.z << ")" << std::endl;
+
+                if (chunkManager.getBlock(block.x, block.y, block.z).isOpaque())
+                {
+                    chunkManager.setBlock(block.x, block.y, block.z, Block::Type::AIR);                    
+                }
+                /*
+                Raycast raycast(camera.getPosition(), camera.getFront(), 5.0f);
                 std::vector<glm::ivec3> blocks = raycast.getBlocks();
                 for (std::vector<glm::ivec3>::iterator it = blocks.begin(); it != blocks.end(); it++)
                 {
                     glm::ivec3 coord = *it;
-                    std::cout << "(" << coord.x << "," << coord.y << "," << coord.z << ",)" << std::endl;
+
+ 
+                    std::cout << "(" << coord.x << "," << coord.y << "," << coord.z << ") " 
+                        << (chunkManager.getBlock(coord.x, coord.y, coord.z).isOpaque() ? "" : "AIR") << std::endl;
+
+                    glm::ivec3 l = worldToChunkLocal(coord);
+
+                    std::cout << "(" << l.x << "," << l.y << "," << l.z << ")" << std::endl;
+
+
+                    if(chunkManager.getBlock(coord.x, coord.y, coord.z).isOpaque())
+                    {
+                        chunkManager.setBlock(coord.x, coord.y, coord.z, Block::Type::AIR);
+                        break;
+                    }
+
                 }
+                */
             }
         }
     }

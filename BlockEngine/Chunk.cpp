@@ -314,7 +314,7 @@ int Chunk::getNumIndices()
 bool Chunk::operator<(const Chunk& other) const
 {
     
-    glm::ivec3 cameraChunkPos = worldToChunk(camera.getPosition());
+    glm::ivec3 cameraChunkPos = chunkAtBlock(blockAt(camera.getPosition()));
 
     int distance = abs(cameraChunkPos.x - x) + abs(cameraChunkPos.y - y) + abs(cameraChunkPos.z - z);
     int otherDistance = abs(cameraChunkPos.x - other.getX()) + abs(cameraChunkPos.y - other.getY()) + abs(cameraChunkPos.z - other.getZ());
@@ -519,10 +519,10 @@ void Chunk::addBlockToMesh(int x, int y, int z, FaceRenderFlags faces, Block* bl
     if (faces.xNeg)
     {
         float left[] = {
-            -0.5f + x, -0.5f + y, -0.5f + z,    uv.bottomLeft.x, uv.bottomLeft.y,       SIDE_SHADE, SIDE_SHADE, SIDE_SHADE,
-            -0.5f + x, -0.5f + y, 0.5f + z,     uv.bottomRight.x, uv.bottomRight.y,     SIDE_SHADE, SIDE_SHADE, SIDE_SHADE,
-            -0.5f + x, 0.5f + y, 0.5f + z,      uv.topRight.x, uv.topRight.y,           SIDE_SHADE, SIDE_SHADE, SIDE_SHADE,
-            -0.5f + x, 0.5f + y, -0.5f + z,     uv.topLeft.x, uv.topLeft.y,             SIDE_SHADE, SIDE_SHADE, SIDE_SHADE
+            x, y, z,    uv.bottomLeft.x, uv.bottomLeft.y,       SIDE_SHADE, SIDE_SHADE, SIDE_SHADE,
+            x, y, 1.0f + z,     uv.bottomRight.x, uv.bottomRight.y,     SIDE_SHADE, SIDE_SHADE, SIDE_SHADE,
+            x, 1.0f + y, 1.0f + z,      uv.topRight.x, uv.topRight.y,           SIDE_SHADE, SIDE_SHADE, SIDE_SHADE,
+            x, 1.0f + y, z,     uv.topLeft.x, uv.topLeft.y,             SIDE_SHADE, SIDE_SHADE, SIDE_SHADE
         };
 
         for (int v = 0; v < 32; v++)
@@ -543,10 +543,10 @@ void Chunk::addBlockToMesh(int x, int y, int z, FaceRenderFlags faces, Block* bl
     if (faces.xPos)
     {
         float right[] = {
-           0.5f + x, -0.5f + y, 0.5f + z,      uv.bottomLeft.x, uv.bottomLeft.y,        SIDE_SHADE, SIDE_SHADE, SIDE_SHADE,
-           0.5f + x, -0.5f + y, -0.5f + z,     uv.bottomRight.x, uv.bottomRight.y,      SIDE_SHADE, SIDE_SHADE, SIDE_SHADE,
-           0.5f + x, 0.5f + y, -0.5f + z,      uv.topRight.x, uv.topRight.y,            SIDE_SHADE, SIDE_SHADE, SIDE_SHADE,
-           0.5f + x, 0.5f + y, 0.5f + z,       uv.topLeft.x, uv.topLeft.y,              SIDE_SHADE, SIDE_SHADE, SIDE_SHADE
+           1.0f + x, y, 1.0 + z,      uv.bottomLeft.x, uv.bottomLeft.y,        SIDE_SHADE, SIDE_SHADE, SIDE_SHADE,
+           1.0f + x, y, z,     uv.bottomRight.x, uv.bottomRight.y,      SIDE_SHADE, SIDE_SHADE, SIDE_SHADE,
+           1.0f + x, 1.0f + y, z,      uv.topRight.x, uv.topRight.y,            SIDE_SHADE, SIDE_SHADE, SIDE_SHADE,
+           1.0f + x, 1.0f + y, 1.0f + z,       uv.topLeft.x, uv.topLeft.y,              SIDE_SHADE, SIDE_SHADE, SIDE_SHADE
         };
 
         for (int v = 0; v < 32; v++)
@@ -567,10 +567,10 @@ void Chunk::addBlockToMesh(int x, int y, int z, FaceRenderFlags faces, Block* bl
     if (faces.zNeg)
     {
         float front[] = {
-            0.5f + x, -0.5f + y, -0.5f + z,     uv.bottomLeft.x, uv.bottomLeft.y,           1.0f, 1.0f, 1.0f,
-            -0.5f + x, -0.5f + y, -0.5f + z,    uv.bottomRight.x, uv.bottomRight.y,         1.0f, 1.0f, 1.0f,
-            -0.5f + x, 0.5f + y, -0.5f + z,     uv.topRight.x, uv.topRight.y,               1.0f, 1.0f, 1.0f,
-            0.5f + x, 0.5f + y, -0.5f + z,      uv.topLeft.x, uv.topLeft.y,               1.0f, 1.0f, 1.0f
+            1.0f + x, y, z,     uv.bottomLeft.x, uv.bottomLeft.y,           1.0f, 1.0f, 1.0f,
+            x, y, z,    uv.bottomRight.x, uv.bottomRight.y,         1.0f, 1.0f, 1.0f,
+            x, 1.0f + y, z,     uv.topRight.x, uv.topRight.y,               1.0f, 1.0f, 1.0f,
+            1.0f + x, 1.0 + y, z,      uv.topLeft.x, uv.topLeft.y,               1.0f, 1.0f, 1.0f
         };
 
         for (int v = 0; v < 32; v++)
@@ -591,10 +591,10 @@ void Chunk::addBlockToMesh(int x, int y, int z, FaceRenderFlags faces, Block* bl
     if (faces.zPos)
     {
         float back[] = {
-            -0.5f + x, -0.5f + y, 0.5f + z,     uv.bottomLeft.x, uv.bottomLeft.y,       1.0f, 1.0f, 1.0f,
-            0.5f + x, -0.5f + y, 0.5f + z,      uv.bottomRight.x, uv.bottomRight.y,     1.0f, 1.0f, 1.0f,
-            0.5f + x, 0.5f + y, 0.5f + z,       uv.topRight.x, uv.topRight.y,           1.0f, 1.0f, 1.0f,
-            -0.5f + x, 0.5f + y, 0.5f + z,      uv.topLeft.x, uv.topLeft.y,           1.0f, 1.0f, 1.0f
+            x, y, 1.0f + z,     uv.bottomLeft.x, uv.bottomLeft.y,       1.0f, 1.0f, 1.0f,
+            1.0f + x, y, 1.0f + z,      uv.bottomRight.x, uv.bottomRight.y,     1.0f, 1.0f, 1.0f,
+            1.0f + x, 1.0f + y, 1.0f + z,       uv.topRight.x, uv.topRight.y,           1.0f, 1.0f, 1.0f,
+            x, 1.0f + y, 1.0f + z,      uv.topLeft.x, uv.topLeft.y,           1.0f, 1.0f, 1.0f
         };
 
         for (int v = 0; v < 32; v++)
@@ -619,10 +619,10 @@ void Chunk::addBlockToMesh(int x, int y, int z, FaceRenderFlags faces, Block* bl
     if (faces.yNeg)
     {
         float bottom[] = {
-            -0.5f + x, -0.5f + y, -0.5f + z,    uv.topLeft.x, uv.topLeft.y,              BOT_SHADE, BOT_SHADE, BOT_SHADE,
-            0.5f + x, -0.5f + y, -0.5f + z,     uv.topRight.x, uv.topRight.y,            BOT_SHADE, BOT_SHADE, BOT_SHADE,
-            0.5f + x, -0.5f + y, 0.5f + z,      uv.bottomRight.x, uv.bottomRight.y,      BOT_SHADE, BOT_SHADE, BOT_SHADE,
-            -0.5f + x, -0.5f + y, 0.5f + z,     uv.bottomLeft.x, uv.bottomLeft.y,        BOT_SHADE, BOT_SHADE, BOT_SHADE
+            x, y, z,    uv.topLeft.x, uv.topLeft.y,              BOT_SHADE, BOT_SHADE, BOT_SHADE,
+            1.0f + x, y, z,     uv.topRight.x, uv.topRight.y,            BOT_SHADE, BOT_SHADE, BOT_SHADE,
+            1.0f + x, y, 1.0f + z,      uv.bottomRight.x, uv.bottomRight.y,      BOT_SHADE, BOT_SHADE, BOT_SHADE,
+            x, y, 1.0f + z,     uv.bottomLeft.x, uv.bottomLeft.y,        BOT_SHADE, BOT_SHADE, BOT_SHADE
         };
 
         for (int v = 0; v < 32; v++)
@@ -647,10 +647,10 @@ void Chunk::addBlockToMesh(int x, int y, int z, FaceRenderFlags faces, Block* bl
     if (faces.yPos)
     {
         float top[] = {
-            0.5f + x, 0.5f + y, -0.5f + z,      uv.topRight.x, uv.topRight.y,               1.0f, 1.0f, 1.0f,
-            -0.5f + x, 0.5f + y, -0.5f + z,     uv.topLeft.x, uv.topLeft.y,               1.0f, 1.0f, 1.0f,
-            -0.5f + x, 0.5f + y, 0.5f + z,      uv.bottomLeft.x, uv.bottomLeft.y,           1.0f, 1.0f, 1.0f,
-            0.5f + x, 0.5f + y, 0.5f + z,       uv.bottomRight.x, uv.bottomRight.y,         1.0f, 1.0f, 1.0f
+            1.0f + x, 1.0f + y, z,      uv.topRight.x, uv.topRight.y,               1.0f, 1.0f, 1.0f,
+            x, 1.0f + y, z,     uv.topLeft.x, uv.topLeft.y,               1.0f, 1.0f, 1.0f,
+            x, 1.0f + y, 1.0f + z,      uv.bottomLeft.x, uv.bottomLeft.y,           1.0f, 1.0f, 1.0f,
+            1.0f + x, 1.0f + y, 1.0f+ z,       uv.bottomRight.x, uv.bottomRight.y,         1.0f, 1.0f, 1.0f
         };
 
         for (int v = 0; v < 32; v++)

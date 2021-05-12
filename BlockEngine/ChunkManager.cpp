@@ -1,4 +1,5 @@
 #include "ChunkManager.h"
+#include "Util.h"
 
 #include <iostream>
 #include <algorithm>
@@ -413,5 +414,29 @@ void ChunkManager::updateNeighbors(Chunk* chunk, int x, int y, int z)
             chunkZPos->setZNeg(chunk);
         }
     }
+}
+
+Block ChunkManager::getBlock(int x, int y, int z)
+{    
+    glm::ivec3 chunkCoord = chunkAtBlock(glm::vec3(x, y, z));
+    Chunk* chunk = getChunk(chunkCoord.x, chunkCoord.y, chunkCoord.z);
+    if (chunk != nullptr)
+    {
+        glm::ivec3 chunkLocal = toChunkInternal(glm::vec3(x, y, z));
+        return chunk->getBlock(chunkLocal.x, chunkLocal.y, chunkLocal.z);
+    }
+    return Block();
+}
+
+void ChunkManager::setBlock(int x, int y, int z, Block::Type type)
+{
+    glm::ivec3 chunkCoord = chunkAtBlock(glm::vec3(x, y, z));
+    Chunk* chunk = getChunk(chunkCoord.x, chunkCoord.y, chunkCoord.z);
+    if (chunk != nullptr)
+    {
+        glm::ivec3 chunkLocal = toChunkInternal(glm::vec3(x, y, z));
+        chunk->setBlock(chunkLocal.x, chunkLocal.y, chunkLocal.z, type);
+        chunk->setNeedsRebuild(true, true);
+    }    
 }
 
