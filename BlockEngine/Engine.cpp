@@ -100,10 +100,11 @@ void Engine::handleEvents()
                 camera.handleMouse(event.motion);
         }
 
-        if (event.type = SDL_MOUSEBUTTONDOWN)
+        if (event.type == SDL_MOUSEBUTTONDOWN && mouseMode == MouseMode::Camera)
         {
             if (event.button.button == SDL_BUTTON_LEFT)
             {
+                /*
                 glm::ivec3 block = blockAt(camera.getPosition());
                 std::cout << "(" << block.x << "," << block.y << "," << block.z << ")" << std::endl;
 
@@ -111,21 +112,13 @@ void Engine::handleEvents()
                 {
                     chunkManager.setBlock(block.x, block.y, block.z, Block::Type::AIR);                    
                 }
-                /*
+                */
+
                 Raycast raycast(camera.getPosition(), camera.getFront(), 5.0f);
                 std::vector<glm::ivec3> blocks = raycast.getBlocks();
                 for (std::vector<glm::ivec3>::iterator it = blocks.begin(); it != blocks.end(); it++)
                 {
                     glm::ivec3 coord = *it;
-
- 
-                    std::cout << "(" << coord.x << "," << coord.y << "," << coord.z << ") " 
-                        << (chunkManager.getBlock(coord.x, coord.y, coord.z).isOpaque() ? "" : "AIR") << std::endl;
-
-                    glm::ivec3 l = worldToChunkLocal(coord);
-
-                    std::cout << "(" << l.x << "," << l.y << "," << l.z << ")" << std::endl;
-
 
                     if(chunkManager.getBlock(coord.x, coord.y, coord.z).isOpaque())
                     {
@@ -133,8 +126,7 @@ void Engine::handleEvents()
                         break;
                     }
 
-                }
-                */
+                }                
             }
         }
     }

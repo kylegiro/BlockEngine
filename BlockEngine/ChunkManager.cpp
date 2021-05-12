@@ -418,11 +418,11 @@ void ChunkManager::updateNeighbors(Chunk* chunk, int x, int y, int z)
 
 Block ChunkManager::getBlock(int x, int y, int z)
 {    
-    glm::ivec3 chunkCoord = chunkAtBlock(glm::vec3(x, y, z));
+    glm::ivec3 chunkCoord = chunkAtBlock(glm::ivec3(x, y, z));
     Chunk* chunk = getChunk(chunkCoord.x, chunkCoord.y, chunkCoord.z);
     if (chunk != nullptr)
     {
-        glm::ivec3 chunkLocal = toChunkInternal(glm::vec3(x, y, z));
+        glm::ivec3 chunkLocal = toChunkInternal(glm::ivec3(x, y, z));
         return chunk->getBlock(chunkLocal.x, chunkLocal.y, chunkLocal.z);
     }
     return Block();
@@ -430,11 +430,11 @@ Block ChunkManager::getBlock(int x, int y, int z)
 
 void ChunkManager::setBlock(int x, int y, int z, Block::Type type)
 {
-    glm::ivec3 chunkCoord = chunkAtBlock(glm::vec3(x, y, z));
+    glm::ivec3 chunkCoord = chunkAtBlock(glm::ivec3(x, y, z));
     Chunk* chunk = getChunk(chunkCoord.x, chunkCoord.y, chunkCoord.z);
     if (chunk != nullptr)
     {
-        glm::ivec3 chunkLocal = toChunkInternal(glm::vec3(x, y, z));
+        glm::ivec3 chunkLocal = toChunkInternal(glm::ivec3(x, y, z));
         chunk->setBlock(chunkLocal.x, chunkLocal.y, chunkLocal.z, type);
         chunk->setNeedsRebuild(true, true);
     }    

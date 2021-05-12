@@ -9,6 +9,7 @@ Raycast::Raycast(glm::vec3 origin, glm::vec3 direction, float length)
 	int x = block.x;
 	int y = block.y;
 	int z = block.z;
+	blocks.push_back(glm::ivec3(x, y, z));
 
 	int stepX = direction.x < 0 ? -1 : 1;
 	int stepY = direction.y < 0 ? -1 : 1;

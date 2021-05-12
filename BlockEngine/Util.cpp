@@ -21,6 +21,13 @@ glm::ivec3 blockAt(glm::vec3 world)
 
 glm::ivec3 chunkAtBlock(glm::ivec3 block)
 {    
+    if (block.x < -1.0f)
+        block.x += 1;
+    if (block.y < -1.0f)
+        block.y += 1;
+    if (block.z < -1.0f)
+        block.z += 1;
+
     int chunkX = (int)(block.x / CHUNK_SIZE);
     int chunkY = (int)(block.y / CHUNK_SIZE);
     int chunkZ = (int)(block.z / CHUNK_SIZE);
@@ -44,18 +51,20 @@ glm::ivec3 toChunkInternal(glm::ivec3 block)
     if (block.x >= 0.0f)
         x = (int)(block.x) % (CHUNK_SIZE);
     else
-        x = (CHUNK_SIZE) - (int)(abs(block.x)) % (CHUNK_SIZE);
+        x = (int)(abs(block.x)) % (CHUNK_SIZE) == 0 ? 0 : (CHUNK_SIZE)-(int)(abs(block.x)) % (CHUNK_SIZE);
 
 
     if (block.y >= 0.0f)
         y = (int)(block.y) % (CHUNK_SIZE);
     else
-        y = (CHUNK_SIZE) - (int)(abs(block.y)) % (CHUNK_SIZE);
+        y = (int)(abs(block.y)) % (CHUNK_SIZE) == 0 ? 0 : (CHUNK_SIZE)-(int)(abs(block.y)) % (CHUNK_SIZE);
 
     if (block.z >= 0.0f)
         z = (int)(block.z) % (CHUNK_SIZE);
     else
-        z = (CHUNK_SIZE) - (int)(abs(block.z)) % (CHUNK_SIZE);
+    {
+        z = (int)(abs(block.z)) % (CHUNK_SIZE) == 0 ? 0 : (CHUNK_SIZE)-(int)(abs(block.z)) % (CHUNK_SIZE);
+    }        
 
 
     return glm::ivec3(x, y, z);

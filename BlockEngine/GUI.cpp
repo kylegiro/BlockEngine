@@ -9,10 +9,11 @@
 
 #include "Engine.h"
 
-// #define DEBUG_NEIGHBORS
+//#define DEBUG_NEIGHBORS
 //#define DEBUG_HEIGHTMAP
 //#define DEBUG_REBUILDCHUNK
 //#define DEBUG_FRUSTUM
+#define DEBUG_BLOCKCOORD
 
 
 GUI::GUI(SDL_Window* window, SDL_GLContext glContext, ChunkManager& chunkManager, NoiseMap& heightMap, Engine& engine)
@@ -39,7 +40,18 @@ void GUI::render(Camera& camera)
 	ImGui::Begin("Debug");
 	//ImVec2 size = ImVec2(200, 100);
 	//ImGui::SetWindowSize(size);
-	ImGui::Text(cameraPos.c_str());	
+
+	ImGui::Text(cameraPos.c_str());
+
+#ifdef DEBUG_BLOCKCOORD
+	glm::ivec3 block = blockAt(camera.getPosition());
+	std::ostringstream ss;
+
+	ss << "Block: (" << block.x << "," << block.y << "," << block.z << ")";
+
+	ImGui::Text(ss.str().c_str());
+#endif
+
 	ImGui::Text(chunkPos.c_str());
 
 #ifdef DEBUG_HEIGHTMAP	
