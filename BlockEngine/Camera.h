@@ -15,6 +15,7 @@ public:
 	void handleMouse(SDL_MouseMotionEvent e);
 	void update(double dt);
 	glm::vec3 getPosition();
+	glm::vec3 getFront();
 
 private:
 	glm::vec3 position, front, up, right, worldUp;

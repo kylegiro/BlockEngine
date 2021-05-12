@@ -1,5 +1,6 @@
 #include "Engine.h"
 #include "Texture.h"
+#include "Raycast.h"
 
 #include <glad/glad.h>
 #include <glm/glm.hpp>
@@ -96,6 +97,20 @@ void Engine::handleEvents()
         {
             if(mouseMode == MouseMode::Camera)
                 camera.handleMouse(event.motion);
+        }
+
+        if (event.type = SDL_MOUSEBUTTONDOWN)
+        {
+            if (event.button.button == SDL_BUTTON_LEFT)
+            {
+                Raycast raycast(camera.getPosition(), camera.getFront(), 10.0f);
+                std::vector<glm::ivec3> blocks = raycast.getBlocks();
+                for (std::vector<glm::ivec3>::iterator it = blocks.begin(); it != blocks.end(); it++)
+                {
+                    glm::ivec3 coord = *it;
+                    std::cout << "(" << coord.x << "," << coord.y << "," << coord.z << ",)" << std::endl;
+                }
+            }
         }
     }
 }

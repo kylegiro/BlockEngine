@@ -13,6 +13,8 @@ NoiseMap::NoiseMap()
 
 NoiseMap::~NoiseMap()
 {
+	map = nullptr;
+	delete map;
 }
 
 double NoiseMap::getValue(double x, double z)

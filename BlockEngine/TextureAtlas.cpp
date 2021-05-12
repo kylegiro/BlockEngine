@@ -25,17 +25,7 @@ void TextureAtlas::bind()
 }
 
 UV TextureAtlas::toUV(AtlasTexture& tex)
-{	
-	// atlas origin is top left, uv origin is bottom left
-	
-	/*
-	UV uv;
-	uv.bottomLeft = glm::vec2(0.0, 0.9375);
-	uv.bottomRight = glm::vec2(0.0625, 0.9375);
-	uv.topLeft = glm::vec2(0.0, 1.0);
-	uv.topRight = glm::vec2(0.0625, 1.0);
-	*/
-	
+{		
 	UV uv;
 	uv.bottomLeft = glm::vec2((float) tex.x / width, (float) (height - tex.y - tex.height) / height);
 	uv.bottomRight = glm::vec2((float) (tex.x + tex.width) / width, (float) (height - tex.y - tex.height) / height);

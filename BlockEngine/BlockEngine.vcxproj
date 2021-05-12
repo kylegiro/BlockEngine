@@ -184,7 +184,7 @@
     <ClCompile Include="Engine.cpp" />
     <ClCompile Include="NoiseMap.cpp" />
     <ClCompile Include="Plane.cpp" />
-    <ClCompile Include="Quad.cpp" />
+    <ClCompile Include="Raycast.cpp" />
     <ClCompile Include="SDLManager.cpp" />
     <ClCompile Include="Shader.cpp" />
     <ClCompile Include="stb_image.cpp" />
@@ -204,8 +204,7 @@
     <ClInclude Include="GUI.h" />
     <ClInclude Include="NoiseMap.h" />
     <ClInclude Include="Plane.h" />
-    <ClInclude Include="Quad.h" />
-    <ClInclude Include="Render.h" />
+    <ClInclude Include="Raycast.h" />
     <ClInclude Include="SDLManager.h" />
     <ClInclude Include="Shader.h" />
     <ClInclude Include="Texture.h" />

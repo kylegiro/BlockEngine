@@ -2,7 +2,6 @@
 
 #include "Window.h"
 #include "Shader.h"
-#include "Quad.h"
 #include "Chunk.h"
 #include "Texture.h"
 #include "Camera.h"
